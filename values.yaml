@@ -79,7 +79,7 @@ apps:
       chart:
         repoURL: chart.cr.io/helm
         version: 0.1.0
-        name: ezto-core
+        name: acme-core
       sync:
         automated:
           prune: true

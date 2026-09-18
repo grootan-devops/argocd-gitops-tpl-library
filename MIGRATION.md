@@ -19,11 +19,11 @@ Version `1.3.0` fixes the extras application naming bug in `tpl.argocd.applicati
   ```
   {{ .Chart.Name }}-extras-{{ .Values.environment }}-{{ dirName }}
   ```
-  *(Example: `ezto-scaleway-zentre` + `extras` + `dev` + `clamav` -> `ezto-scaleway-zentre-extras-dev-clamav`)*
+  *(Example: `acme-cloud-myapp` + `extras` + `dev` + `clamav` -> `acme-cloud-myapp-extras-dev-clamav`)*
 - **Automatic Environment Fallback**:
-  If `.Values.environment` is omitted, the template automatically derives the environment from the last segment of `.Values.branch` (e.g., `zentre/dev` -> `dev`).
+  If `.Values.environment` is omitted, the template automatically derives the environment from the last segment of `.Values.branch` (e.g., `myapp/dev` -> `dev`).
 - **Zero-Regression Backward Compatibility**:
-  If `extras/Chart.yaml` still contains the legacy `-extras.*` suffix, the template cleanly strips it so names are never duplicated (e.g., `ezto-scaleway-zentre-extras-dev-extras-dev` is prevented).
+  If `extras/Chart.yaml` still contains the legacy `-extras.*` suffix, the template cleanly strips it so names are never duplicated (e.g., `acme-cloud-myapp-extras-dev-extras-dev` is prevented).
 
 ### 3. Migration Instructions for GitOps Repositories
 
@@ -32,7 +32,7 @@ Align `extras/Chart.yaml` name with the root `Chart.yaml`:
 ```yaml
 # Before (Legacy Workaround):
 apiVersion: v2
-name: ezto-scaleway-zentre-extras-dev
+name: acme-cloud-myapp-extras-dev
 version: 1.0.0
 dependencies:
   - name: argocd-gitops-tpl-library
@@ -40,7 +40,7 @@ dependencies:
 
 # After (Standardized in 1.3.0):
 apiVersion: v2
-name: ezto-scaleway-zentre
+name: acme-cloud-myapp
 version: 1.0.0
 dependencies:
   - name: argocd-gitops-tpl-library
@@ -53,8 +53,8 @@ Explicitly specify `environment` in `extras/values.yaml` for consistency:
 environment: dev
 project: developer
 server: in-cluster
-repoURL: https://gitlab.ezto.io/devops/gitops/ezto-scaleway.git
-branch: zentre/dev
+repoURL: https://gitlab.example.com/devops/gitops/acme-cloud.git
+branch: myapp/dev
 ```
 
 ---

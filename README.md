@@ -10,7 +10,7 @@ To use this library in your GitOps repository, declare it as a Helm dependency i
 
 ```console
 # Login to OCI Registry
-helm registry login registry.ezto.io --username <registry-username> --password <registry-token>
+helm registry login registry.example.com --username <registry-username> --password <registry-token>
 ```
 
 ```yaml
@@ -22,7 +22,7 @@ type: application
 dependencies:
   - name: argocd-gitops-tpl-library
     version: 1.3.0
-    repository: oci://registry.ezto.io/helm
+    repository: oci://registry.example.com/helm
 ```
 
 Execute `helm dependency build` to download the library into your `charts/` directory.
@@ -37,7 +37,7 @@ This library powers enterprise GitOps repositories by implementing an automated,
 +-----------------------------------------------------------------------+
 |                Root Bootstrap Application                             |
 |          <product-prefix>-<environment>-root                          |
-|         (e.g., ezto-scaleway-zentre-dev-root)                         |
+|         (e.g., acme-cloud-myapp-dev-root)                         |
 +-----------------------------------+-----------------------------------+
                                     |
           +-------------------------+-------------------------+
@@ -46,7 +46,7 @@ This library powers enterprise GitOps repositories by implementing an automated,
 +------------------------------------+   +------------------------------------+
 |     Helm Microservices Apps        |   |      Extras Parent App             |
 |       (templates/apps.yaml)        |   |   <product-prefix>-extras-<env>    |
-+------------------------------------+   | (e.g. ezto-scaleway-zentre-extras) |
++------------------------------------+   | (e.g. acme-cloud-myapp-extras) |
 | • <product>-<app1>-<env>           |   +-----------------+------------------+
 | • <product>-<group>-<app2>-<env>   |                     |
 | • <product>-<group>-<app3>-<env>   |                     v
@@ -67,26 +67,26 @@ This library powers enterprise GitOps repositories by implementing an automated,
 In this architecture, `Chart.yaml` is the **canonical source of identity** for your entire cluster stack:
 
 1. **Product Prefix (`.Chart.Name`)**:
-   The `name` field in `Chart.yaml` establishes the global prefix for every Kubernetes and ArgoCD resource (e.g., `ezto-scaleway-zentre`).
+   The `name` field in `Chart.yaml` establishes the global prefix for every Kubernetes and ArgoCD resource (e.g., `acme-cloud-myapp`).
 2. **Unified Naming Across Stacks**:
    Both the root chart and the `extras/` chart must define the **exact same `name`** in their respective `Chart.yaml` files.
-   - **Root `Chart.yaml`**: `name: ezto-scaleway-zentre`
-   - **`extras/Chart.yaml`**: `name: ezto-scaleway-zentre` (Do NOT append `-extras-dev`!)
+   - **Root `Chart.yaml`**: `name: acme-cloud-myapp`
+   - **`extras/Chart.yaml`**: `name: acme-cloud-myapp` (Do NOT append `-extras-dev`!)
 
 ### Naming Resolution Matrix
 
 | Application Level | Source / Invocation | Naming Formula | Concrete Example |
 |---|---|---|---|
-| **Root App-of-Apps** | Bootstrap Manifest | `<Chart.Name>-<environment>-root` | `ezto-scaleway-zentre-dev-root` |
-| **Standalone Helm App** | `apps.<name>` | `<Chart.Name>-<displayName>-<environment>` | `ezto-scaleway-zentre-notification-dev` |
-| **Grouped Helm App** | `apps.<group>.<name>` | `<Chart.Name>-<group>-<displayName>-<environment>` | `ezto-scaleway-zentre-admin-frontend-dev` |
-| **Nested Helm App** | `apps.<group>.<subgroup>.<name>` | `<Chart.Name>-<group>-<subgroup>-<displayName>-<environment>` | `ezto-scaleway-zentre-mcp-hub-connector-dev` |
-| **Extras Parent App** | `extras:` in root `values.yaml` | `<Chart.Name>-extras-<environment>` | `ezto-scaleway-zentre-extras-dev` |
-| **Raw Manifest App** | `extras/manifests/<dir>` | `<Chart.Name>-extras-<environment>-<dirName>` | `ezto-scaleway-zentre-extras-dev-clamav` |
-| **Root Manifests App** | `extras/manifests/*.yaml` | `<Chart.Name>-extras-<environment>-root` | `ezto-scaleway-zentre-extras-dev-root` |
+| **Root App-of-Apps** | Bootstrap Manifest | `<Chart.Name>-<environment>-root` | `acme-cloud-myapp-dev-root` |
+| **Standalone Helm App** | `apps.<name>` | `<Chart.Name>-<displayName>-<environment>` | `acme-cloud-myapp-notification-dev` |
+| **Grouped Helm App** | `apps.<group>.<name>` | `<Chart.Name>-<group>-<displayName>-<environment>` | `acme-cloud-myapp-admin-frontend-dev` |
+| **Nested Helm App** | `apps.<group>.<subgroup>.<name>` | `<Chart.Name>-<group>-<subgroup>-<displayName>-<environment>` | `acme-cloud-myapp-mcp-hub-connector-dev` |
+| **Extras Parent App** | `extras:` in root `values.yaml` | `<Chart.Name>-extras-<environment>` | `acme-cloud-myapp-extras-dev` |
+| **Raw Manifest App** | `extras/manifests/<dir>` | `<Chart.Name>-extras-<environment>-<dirName>` | `acme-cloud-myapp-extras-dev-clamav` |
+| **Root Manifests App** | `extras/manifests/*.yaml` | `<Chart.Name>-extras-<environment>-root` | `acme-cloud-myapp-extras-dev-root` |
 
 > [!IMPORTANT]
-> In version `1.3.0`+, the library automatically generates `{Chart.Name}-extras-{environment}-{dirName}`. If `.Values.environment` is omitted in `extras/values.yaml`, it automatically falls back to the target branch name segment (e.g. branch `zentre/dev` $\rightarrow$ `dev`).
+> In version `1.3.0`+, the library automatically generates `{Chart.Name}-extras-{environment}-{dirName}`. If `.Values.environment` is omitted in `extras/values.yaml`, it automatically falls back to the target branch name segment (e.g. branch `myapp/dev` $\rightarrow$ `dev`).
 
 ---
 
@@ -136,7 +136,7 @@ The root `values.yaml` governs the global cluster settings and catalog of Helm m
 | `environment` | string | `""` | Target environment identifier (`dev`, `qa`, `staging`, `prod`). Appended to application names. |
 | `server` | string | `"in-cluster"` | ArgoCD destination server name or cluster API endpoint. |
 | `repoURL` | string | `""` | Git clone URL for this GitOps repository. |
-| `branch` | string | `""` | Git branch or revision tracked by ArgoCD (e.g. `zentre/dev`, `main`). |
+| `branch` | string | `""` | Git branch or revision tracked by ArgoCD (e.g. `myapp/dev`, `main`). |
 | `preserveResourcesOnDeletion` | bool | `false` | When `true`, removes the ArgoCD deletion finalizer so deleting the Application CR does not purge cluster resources. |
 | `sync.options` | list | `[...]` | Global sync options applied to all applications (`Validate=true`, `PruneLast=true`, `ApplyOutOfSyncOnly=true`, etc.). |
 | `sync.retry` | map | `{ limit: 5, backoff: ... }` | Default retry backoff settings for out-of-sync applications. |
@@ -238,15 +238,15 @@ To initialize the entire GitOps stack in your Kubernetes cluster, create and app
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ezto-scaleway-zentre-dev-root
+  name: acme-cloud-myapp-dev-root
   namespace: argo-cd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: developer
   source:
-    repoURL: https://gitlab.ezto.io/devops/gitops/ezto-scaleway.git
-    targetRevision: zentre/dev
+    repoURL: https://gitlab.example.com/devops/gitops/acme-cloud.git
+    targetRevision: myapp/dev
     path: .
     helm:
       valueFiles:
@@ -323,7 +323,7 @@ spec:
 | apps.groupa.sample1.namespace | string | `"namespace-override"` |  |
 | apps.groupa.sample1.chart.repoURL | string | `"chart.cr.io/helm"` |  |
 | apps.groupa.sample1.chart.version | string | `"0.1.0"` |  |
-| apps.groupa.sample1.chart.name | string | `"ezto-core"` |  |
+| apps.groupa.sample1.chart.name | string | `"acme-core"` |  |
 | apps.groupa.sample1.sync.automated.prune | bool | `true` |  |
 | apps.groupa.sample1.sync.automated.selfHeal | bool | `true` |  |
 | apps.groupa.sample1.sync.options | list | `[]` |  |
