@@ -1,8 +1,12 @@
-# ArgoCD GitOps tpl Library
+{{ template "chart.header" . }}
 
-![Version: 1.3.0](https://img.shields.io/badge/Version-1.3.0-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 1.3.0](https://img.shields.io/badge/AppVersion-1.3.0-informational?style=flat-square)
+{{ template "chart.badgesSection" . }}
 
-Helm tpl library for gitops repo
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.description" . }}
 
 ## 1. Quick Start & Consumption
 
@@ -99,7 +103,7 @@ gitops-repo/
 ├── Chart.yaml                  # Root chart metadata (name: <product-prefix>)
 ├── values.yaml                 # Root values: global options, environment, apps catalog
 ├── templates/
-│   └── apps.yaml               # One-line template: {{- include "tpl.argocd.applications" $ }}
+│   └── apps.yaml               # One-line template: {{`{{- include "tpl.argocd.applications" $ }}`}}
 ├── values/                     # Microservice Helm value overrides
 │   ├── notification.yaml       # Overrides for standalone service "notification"
 │   ├── chat/
@@ -111,7 +115,7 @@ gitops-repo/
     ├── Chart.yaml              # Extras chart metadata (name: <product-prefix>)
     ├── values.yaml             # Extras parameters, sync policies & per-manifest toggles
     ├── templates/
-    │   └── manifest.yaml       # One-line template: {{- include "tpl.argocd.application.extras" $ }}
+    │   └── manifest.yaml       # One-line template: {{`{{- include "tpl.argocd.application.extras" $ }}`}}
     └── manifests/              # Plain Kubernetes manifests grouped by folder
         ├── clamav/
         │   └── deployment.yaml
@@ -271,78 +275,25 @@ spec:
 
 ---
 
-## Requirements
+{{ template "chart.requirementsHeader" . }}
+
+{{ template "chart.kubeVersionLine" . }}
 
 - Helm: `>=3.2.0`
 - Kubernetes: `>=1.27`
 
-| Repository | Name | Version |
-|------------|------|---------|
+{{ template "chart.requirementsTable" . }}
 
-## Values
+{{ template "chart.maintainersSection" . }}
 
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| enabled | bool | `true` |  |
-| environment | string | `"sample"` |  |
-| project | string | `"default"` |  |
-| server | string | `"in-cluster"` |  |
-| repoURL | string | `"https://gitlab.com/gitops.git"` |  |
-| branch | string | `"sample"` |  |
-| preserveResourcesOnDeletion | bool | `false` |  |
-| sync.options[0] | string | `"Validate=true"` |  |
-| sync.options[1] | string | `"CreateNamespace=true"` |  |
-| sync.options[2] | string | `"PrunePropagationPolicy=foreground"` |  |
-| sync.options[3] | string | `"PruneLast=true"` |  |
-| sync.options[4] | string | `"RespectIgnoreDifferences=true"` |  |
-| sync.options[5] | string | `"ApplyOutOfSyncOnly=true"` |  |
-| sync.retry.limit | int | `5` |  |
-| sync.retry.backoff.duration | string | `"5s"` |  |
-| sync.retry.backoff.factor | int | `2` |  |
-| sync.retry.backoff.maxDuration | string | `"3m"` |  |
-| sync.ignoreDifferences | list | `[]` |  |
-| notification.notification1.template | string | `"teams-template"` |  |
-| notification.notification1.channel[0] | string | `"team-channel"` |  |
-| extras.enabled | bool | `true` |  |
-| extras.sync.automated.prune | bool | `true` |  |
-| extras.sync.automated.selfHeal | bool | `true` |  |
-| extras.sync.options | list | `[]` |  |
-| extras.sync.retry | object | `{}` |  |
-| apps.sample.enabled | bool | `true` |  |
-| apps.sample.chart.repoURL | string | `"chart.cr.io/helm"` |  |
-| apps.sample.chart.version | string | `"0.1.0"` |  |
-| apps.sample.chart.name | string | `"test"` |  |
-| apps.sample.sync.automated.prune | bool | `true` |  |
-| apps.sample.sync.automated.selfHeal | bool | `true` |  |
-| apps.sample.sync.options | list | `[]` |  |
-| apps.sample.sync.retry | object | `{}` |  |
-| apps.groupa.enabled | bool | `true` |  |
-| apps.groupa.namespace | string | `"group-namespace"` |  |
-| apps.groupa.sample1.enabled | bool | `true` |  |
-| apps.groupa.sample1.releaseName | string | `"sample1-override"` |  |
-| apps.groupa.sample1.namespace | string | `"namespace-override"` |  |
-| apps.groupa.sample1.chart.repoURL | string | `"chart.cr.io/helm"` |  |
-| apps.groupa.sample1.chart.version | string | `"0.1.0"` |  |
-| apps.groupa.sample1.chart.name | string | `"ezto-core"` |  |
-| apps.groupa.sample1.sync.automated.prune | bool | `true` |  |
-| apps.groupa.sample1.sync.automated.selfHeal | bool | `true` |  |
-| apps.groupa.sample1.sync.options | list | `[]` |  |
-| apps.groupa.sample1.sync.retry | object | `{}` |  |
-| apps.groupa.sample2.enabled | bool | `true` |  |
-| apps.groupa.sample2.releaseName | string | `"sample2-override"` |  |
-| apps.groupa.sample2.chart.repoURL | string | `"chart.cr.io/helm"` |  |
-| apps.groupa.sample2.chart.version | string | `"0.1.0"` |  |
-| apps.groupa.sample2.chart.name | string | `"sample2"` |  |
-| apps.groupa.sample2.sync.automated | object | `{}` |  |
-| apps.groupa.sample2.sync.options | list | `[]` |  |
-| apps.groupa.sample2.sync.retry | object | `{}` |  |
-| apps.groupa.sample3.enabled | bool | `true` |  |
-| apps.groupa.sample3.namespace | string | `"sample3"` |  |
-| apps.groupa.sample3.releaseName | string | `"sample3"` |  |
-| apps.groupa.sample3.chart.path | string | `"sample3"` |  |
-| apps.groupa.sample3.chart.valuesFiles[0] | string | `"values1.yaml"` |  |
-| apps.groupa.sample3.sync.automated.prune | bool | `true` |  |
-| apps.groupa.sample3.sync.automated.selfHeal | bool | `true` |  |
+{{ template "chart.sourcesSection" . }}
 
-----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}
+
+## Usage
+
+```console
+helm-docs --template-files README.gotmpl --sort-values-order file --document-dependency-values
+```

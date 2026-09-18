@@ -1,0 +1,9 @@
+# Helm packaging & dependencies
+charts/
+Chart.lock
+*.tgz
+
+# OS & temporary files
+.DS_Store
+*.swp
+*.tmp
