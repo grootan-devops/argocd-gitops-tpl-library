@@ -1,0 +1,48 @@
+enabled: true
+environment: dev
+project: contoso
+server: in-cluster
+repoURL: https://github.com/contoso/platform-gitops.git
+branch: payments/dev
+preserveResourcesOnDeletion: false
+renderExtrasManifests: false
+sync:
+  options:
+    - Validate=true
+    - CreateNamespace=true
+  retry:
+    limit: 5
+    backoff:
+      duration: 5s
+      factor: 2
+      maxDuration: 3m
+notification: {}
+extras:
+  enabled: true
+  sync:
+    automated:
+      prune: true
+      selfHeal: true
+apps:
+  api:
+    enabled: true
+    namespace: payments
+    chart:
+      repoURL: oci://registry.contoso.com/helm
+      name: payment-api
+      version: 1.0.0
+    sync:
+      automated:
+        prune: true
+        selfHeal: true
+  admin:
+    enabled: true
+    namespace: administration
+    frontend:
+      enabled: true
+      chart:
+        repoURL: oci://registry.contoso.com/helm
+        name: admin-frontend
+        version: 1.0.0
+      sync:
+        automated: {}

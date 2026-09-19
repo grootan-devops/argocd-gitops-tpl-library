@@ -1,0 +1,3 @@
+{{- if .Values.renderExtrasManifests }}
+{{- include "tpl.argocd.application.extras" . }}
+{{- end }}

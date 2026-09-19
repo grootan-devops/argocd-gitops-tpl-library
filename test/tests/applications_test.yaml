@@ -1,0 +1,35 @@
+suite: ArgoCD application contracts
+templates:
+  - templates/apps.yaml
+tests:
+  - it: renders standalone and nested applications with canonical names
+    asserts:
+      - hasDocuments:
+          count: 3
+      - equal:
+          path: metadata.name
+          value: contoso-platform-admin-frontend-dev
+        documentIndex: 0
+      - equal:
+          path: spec.source.targetRevision
+          value: "1.0.0"
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: contoso-platform-api-dev
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: contoso-platform-extras-dev
+        documentIndex: 2
+  - it: disables selected applications and preserves resources
+    values:
+      - ../values/disabled.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: contoso-platform-admin-frontend-qa
+      - notExists:
+          path: metadata.finalizers

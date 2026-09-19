@@ -1,5 +1,7 @@
 {{ template "chart.header" . }}
 
+[Compatibility](https://github.com/grootan-devops/ai-skills/blob/main/COMPATIBILITY.md) · [Security](./SECURITY.md) · [Reporting policy](./CONTRIBUTING.md)
+
 {{ template "chart.badgesSection" . }}
 
 {{ template "chart.deprecationWarning" . }}
@@ -14,7 +16,7 @@ To use this library in your GitOps repository, declare it as a Helm dependency i
 
 ```console
 # Login to OCI Registry
-helm registry login registry.example.com --username <registry-username> --password <registry-token>
+helm registry login registry.contoso.com --username <registry-username> --password <registry-token>
 ```
 
 ```yaml
@@ -25,8 +27,8 @@ version: 1.0.0
 type: application
 dependencies:
   - name: argocd-gitops-tpl-library
-    version: 1.3.0
-    repository: oci://registry.example.com/helm
+    version: 1.0.0
+    repository: oci://registry.contoso.com/helm
 ```
 
 Execute `helm dependency build` to download the library into your `charts/` directory.
@@ -90,7 +92,7 @@ In this architecture, `Chart.yaml` is the **canonical source of identity** for y
 | **Root Manifests App** | `extras/manifests/*.yaml` | `<Chart.Name>-extras-<environment>-root` | `acme-cloud-myapp-extras-dev-root` |
 
 > [!IMPORTANT]
-> In version `1.3.0`+, the library automatically generates `{Chart.Name}-extras-{environment}-{dirName}`. If `.Values.environment` is omitted in `extras/values.yaml`, it automatically falls back to the target branch name segment (e.g. branch `myapp/dev` $\rightarrow$ `dev`).
+> In version `1.0.0`+, the library automatically generates `{Chart.Name}-extras-{environment}-{dirName}`. If `.Values.environment` is omitted in `extras/values.yaml`, it automatically falls back to the target branch name segment (e.g. branch `myapp/dev` $\rightarrow$ `dev`).
 
 ---
 
@@ -249,7 +251,7 @@ metadata:
 spec:
   project: developer
   source:
-    repoURL: https://gitlab.example.com/devops/gitops/acme-cloud.git
+    repoURL: https://gitlab.contoso.com/devops/gitops/acme-cloud.git
     targetRevision: myapp/dev
     path: .
     helm:
@@ -289,6 +291,14 @@ spec:
 {{ template "chart.sourcesSection" . }}
 
 {{ template "chart.valuesSection" . }}
+
+## License
+
+Copyright 2026 Grootan Technologies Pvt Ltd.
+
+Licensed under the [GNU Affero General Public License v3.0](./LICENSE.md)
+(`AGPL-3.0-only`). External contributions are not accepted; see
+[CONTRIBUTING.md](./CONTRIBUTING.md) for bug and security reporting.
 
 {{ template "helm-docs.versionFooter" . }}
 
