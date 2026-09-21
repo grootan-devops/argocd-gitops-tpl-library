@@ -22,6 +22,7 @@ jobs:
     secrets: inherit
     with:
       chart-dir: "."
+      lint-md-files: "**/*.md !**/README.md"
       ignore-docker: "true"
 
   check:
@@ -46,7 +47,6 @@ jobs:
     secrets: inherit
     with:
       chart-dir: "."
-      md-lint-ignore-rule: "MD022 MD031 MD035 MD040"
 
   chart:
     needs: init
