@@ -4,6 +4,8 @@ run-name: "CI · PR Verification · ${{ github.event_name }} · ${{ github.sha }
 on:
   pull_request:
     branches: [main]
+  merge_group:
+    types: [checks_requested]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
