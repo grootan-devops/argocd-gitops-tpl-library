@@ -33,3 +33,92 @@ tests:
           value: contoso-platform-admin-frontend-qa
       - notExists:
           path: metadata.finalizers
+  - it: honours the global enabled switch for every application type
+    values:
+      - ../values/global-disabled.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: renders every Helm application shape with override precedence
+    values:
+      - ../values/permutations.yaml
+    asserts:
+      - hasDocuments:
+          count: 5
+      # Apps are emitted in lexical root-key order: group, local, nested,
+      # standalone, then the extras parent.
+      - equal:
+          path: metadata.name
+          value: contoso-platform-group-child-prod
+        documentIndex: 0
+      - equal:
+          path: spec.destination.namespace
+          value: group-ns
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: contoso-platform-local-prod
+        documentIndex: 1
+      - equal:
+          path: spec.source.path
+          value: charts/local-service
+        documentIndex: 1
+      - equal:
+          path: spec.source.helm.releaseName
+          value: local-release
+        documentIndex: 1
+      - contains:
+          path: spec.source.helm.valueFiles
+          content: prod.yaml
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: contoso-platform-nested-backend-worker-prod
+        documentIndex: 2
+      - equal:
+          path: spec.destination.namespace
+          value: nested-group-ns
+        documentIndex: 2
+      - equal:
+          path: metadata.name
+          value: contoso-platform-standalone-prod
+        documentIndex: 3
+      - equal:
+          path: spec.source.helm.releaseName
+          value: standalone-release
+        documentIndex: 3
+      - equal:
+          path: spec.destination.namespace
+          value: standalone-ns
+        documentIndex: 3
+      - equal:
+          path: spec.syncPolicy.automated
+          value: {}
+        documentIndex: 3
+      - contains:
+          path: spec.syncPolicy.syncOptions
+          content: Validate=false
+        documentIndex: 3
+      - contains:
+          path: spec.syncPolicy.syncOptions
+          content: PruneLast=true
+        documentIndex: 3
+      - equal:
+          path: spec.syncPolicy.retry.limit
+          value: 9
+        documentIndex: 3
+      - equal:
+          path: spec.ignoreDifferences[0].jsonPointers[0]
+          value: /spec/replicas
+        documentIndex: 3
+      - exists:
+          path: metadata.annotations
+        documentIndex: 3
+      - equal:
+          path: metadata.name
+          value: contoso-platform-extras-prod
+        documentIndex: 4
+      - equal:
+          path: spec.syncPolicy.automated.prune
+          value: false
+        documentIndex: 4

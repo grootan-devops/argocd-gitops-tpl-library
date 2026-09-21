@@ -23,3 +23,47 @@ tests:
           path: metadata.name
           value: contoso-platform-extras-staging-root
         documentIndex: 1
+  - it: applies folder sync overrides and falls back to the branch environment
+    values:
+      - ../values/extras-overrides.yaml
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: metadata.name
+          value: contoso-platform-extras-prod-clamav
+        documentIndex: 0
+      - equal:
+          path: spec.project
+          value: extras-project
+        documentIndex: 0
+      - equal:
+          path: spec.destination.namespace
+          value: extras-ns
+        documentIndex: 0
+      - exists:
+          path: metadata.finalizers
+        documentIndex: 0
+      - notExists:
+          path: spec.syncPolicy.automated
+        documentIndex: 0
+      - contains:
+          path: spec.syncPolicy.syncOptions
+          content: Validate=false
+        documentIndex: 0
+      - contains:
+          path: spec.syncPolicy.syncOptions
+          content: CreateNamespace=true
+        documentIndex: 0
+      - equal:
+          path: spec.syncPolicy.retry.limit
+          value: 8
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: contoso-platform-extras-prod-root
+        documentIndex: 1
+      - equal:
+          path: spec.syncPolicy.retry.limit
+          value: 5
+        documentIndex: 1

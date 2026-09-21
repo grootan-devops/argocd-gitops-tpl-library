@@ -44,18 +44,19 @@ spec:
   {{- include "tpl.argocd.application.helm.app" $ | indent 2 }}
   {{- end }}
   syncPolicy:
-    {{- if (hasKey (.appName).sync "automated") }}
-    {{- if (.appName).sync.automated }}
-    automated: {{- (.appName).sync.automated | toYaml | nindent 6 }}
+    {{- $appSync := (.appName).sync | default dict }}
+    {{- if hasKey $appSync "automated" }}
+    {{- if $appSync.automated }}
+    automated: {{- $appSync.automated | toYaml | nindent 6 }}
     {{- else }}
     automated: {}
     {{- end }}
     {{- end }}
-    {{- $appOptions := (.appName).sync.options | default list }}
+    {{- $appOptions := $appSync.options | default list }}
     {{- $globalOptions := $.Values.sync.options | default list }}
     syncOptions:
     {{- include "util.mergeSyncOptions" (dict "global" $globalOptions "app" $appOptions) | nindent 6 }}
-    retry: {{ (.appName).sync.retry | default .Values.sync.retry | toYaml | nindent 6 }}
+    retry: {{ $appSync.retry | default .Values.sync.retry | toYaml | nindent 6 }}
   revisionHistoryLimit: 3
   {{- if (.appName).ignoreDifferences }}
   ignoreDifferences: {{ (.appName).ignoreDifferences | toYaml | nindent 4 }}
