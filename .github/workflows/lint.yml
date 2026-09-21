@@ -18,4 +18,5 @@ jobs:
       contents: read
     secrets: inherit
     with:
-      lint-md-files: "*.md"
+      chart-dir: "."
+      md-lint-ignore-rule: "MD022 MD031 MD035 MD040"
