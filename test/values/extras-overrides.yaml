@@ -1,0 +1,26 @@
+# Exercises the extras chart independently, including environment fallback,
+# per-folder enablement, and sync override precedence.
+enabled: false
+environment: ""
+project: extras-project
+server: https://kubernetes.example.invalid
+namespace: extras-ns
+repoURL: https://github.com/contoso/platform-gitops.git
+branch: releases/prod
+preserveResourcesOnDeletion: false
+renderExtrasManifests: true
+sync:
+  options:
+    - Validate=true
+    - CreateNamespace=true
+  retry:
+    limit: 5
+apps:
+  clamav:
+    enabled: true
+    sync:
+      automated: {}
+      options:
+        - Validate=false
+      retry:
+        limit: 8

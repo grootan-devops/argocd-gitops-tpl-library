@@ -1,0 +1,119 @@
+# Enable/Disable Global ArgoCD Application
+enabled: true
+
+# Global naming inputs                                                          # Application prefix
+environment: sample                                                             # Environment suffix
+project: default                                                                # ArgoCD Project Name
+server: in-cluster                                                              # ArgoCD Cluster
+repoURL: https://gitlab.com/gitops.git  # Git source for Application manifests (excluding extras)
+branch: sample                                                                  # Git Repo Branch
+preserveResourcesOnDeletion: false                                              # Removes finalizers
+
+# Global sync policy fallback for all apps
+sync:
+  options:
+    - Validate=true
+    - CreateNamespace=true
+    - PrunePropagationPolicy=foreground
+    - PruneLast=true
+    - RespectIgnoreDifferences=true
+    - ApplyOutOfSyncOnly=true
+  retry:
+    limit: 5
+    backoff:
+      duration: 5s
+      factor: 2
+      maxDuration: 3m
+  ignoreDifferences: []
+
+# Adds argocd notification annotations
+notification:
+  notification1:
+    template: teams-template
+    channel:
+      - team-channel
+
+# ─────────────────────────────────────────────
+# Extras Folder (non-Helm applications)
+# This creates a separate ArgoCD app pointing to "extras" path in the same repo
+extras:
+  enabled: true
+  sync:
+    automated:
+      prune: true
+      selfHeal: true
+    options: []
+    retry: {}
+
+apps:
+  # App path: .Values.samplea.sample1
+  # Computed:
+  # - releaseName: test (explicit)
+  # - appName:     sample-sample-sample (default pattern from key)
+  sample:
+    enabled: true
+    chart:
+      repoURL: chart.cr.io/helm
+      version: 0.1.0
+      name: test
+    sync:
+      automated:
+        prune: true
+        selfHeal: true
+      options: []
+      retry: {}
+
+  groupa:
+    enabled: true
+    namespace: group-namespace
+
+    # App path: .Values.samplea.sample1
+    # Computed:
+    # - releaseName: sample1-override (explicit)
+    # - appName:     sample-sample1-sample (default pattern from key)
+    # - Namespace - namespace-override
+    sample1:
+      enabled: true
+      releaseName: sample1-override
+      namespace: namespace-override
+      chart:
+        repoURL: chart.cr.io/helm
+        version: 0.1.0
+        name: acme-core
+      sync:
+        automated:
+          prune: true
+          selfHeal: true
+        options: []
+        retry: {}
+
+    # App path: .Values.samplea.sample2
+    # Computed:
+    # - releaseName: sample2-override (explicit override)
+    # - Disables auto-sync by setting empty map
+    # - Namespace - group-namespace
+    sample2:
+      enabled: true
+      releaseName: sample2-override
+      chart:
+        repoURL: chart.cr.io/helm
+        version: 0.1.0
+        name: sample2
+      sync:
+        automated: {}  # disables auto-sync; manual sync only
+        options: []
+        retry: {}
+
+    # It will look for 'values/groupa/sample3/' and it should be a valid helm directory
+    sample3:
+      enabled: true
+      namespace: sample3
+      releaseName: sample3
+      chart:
+        path: sample3
+        valuesFiles:
+          - values1.yaml
+      sync:
+        automated:
+          prune: true
+          selfHeal: true

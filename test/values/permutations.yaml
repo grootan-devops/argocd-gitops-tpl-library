@@ -1,0 +1,86 @@
+# End-to-end consumer values covering every supported application shape and
+# every override precedence rule exposed by the library.
+enabled: true
+environment: prod
+project: overrides-project
+server: https://kubernetes.example.invalid
+namespace: platform-default
+repoURL: https://github.com/contoso/platform-gitops.git
+branch: releases/prod
+preserveResourcesOnDeletion: false
+sync:
+  options:
+    - Validate=true
+    - CreateNamespace=true
+    - PruneLast=false
+  retry:
+    limit: 5
+    backoff:
+      duration: 5s
+      factor: 2
+      maxDuration: 3m
+notification:
+  teams:
+    template: release-status
+    channel:
+      - platform-alerts
+      - sre
+extras:
+  enabled: true
+  sync:
+    automated:
+      prune: false
+      selfHeal: false
+    options:
+      - Validate=false
+    retry:
+      limit: 4
+apps:
+  # The consumer chart's defaults define these two apps. Disable them so this
+  # fixture renders only the deliberately constructed permutation matrix.
+  api:
+    enabled: false
+  admin:
+    enabled: false
+  standalone:
+    chart:
+      repoURL: oci://registry.contoso.com/helm
+      name: standalone-chart
+      version: 2.4.0
+    releaseName: standalone-release
+    namespace: standalone-ns
+    sync:
+      automated: {}
+      options:
+        - Validate=false
+        - PruneLast=true
+      retry:
+        limit: 9
+    ignoreDifferences:
+      - group: apps
+        kind: Deployment
+        jsonPointers:
+          - /spec/replicas
+  group:
+    namespace: group-ns
+    child:
+      chart:
+        repoURL: oci://registry.contoso.com/helm
+        name: group-chart
+        version: 3.0.0
+  nested:
+    namespace: nested-root-ns
+    backend:
+      namespace: nested-group-ns
+      worker:
+        chart:
+          repoURL: oci://registry.contoso.com/helm
+          name: worker-chart
+          version: 4.0.0
+  local:
+    chart:
+      path: charts/local-service
+      valuesFiles:
+        - prod.yaml
+    releaseName: local-release
+    namespace: local-ns

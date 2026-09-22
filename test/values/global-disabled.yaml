@@ -1,0 +1,11 @@
+enabled: false
+renderExtrasManifests: false
+apps:
+  api:
+    enabled: true
+    chart:
+      repoURL: oci://registry.contoso.com/helm
+      name: payment-api
+      version: 1.0.0
+extras:
+  enabled: true

@@ -1,0 +1,10 @@
+apiVersion: v2
+name: contoso-platform
+description: Mock consumer chart for argocd-gitops-tpl-library contract tests.
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+dependencies:
+  - name: argocd-gitops-tpl-library
+    version: "1.0.0"
+    repository: "file://.."

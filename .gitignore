@@ -1,0 +1,14 @@
+# Helm packaging & dependencies
+charts/
+Chart.lock
+*.tgz
+
+# Local credentials
+.env
+.env.*
+!.env.example
+
+# OS & temporary files
+.DS_Store
+*.swp
+*.tmp
