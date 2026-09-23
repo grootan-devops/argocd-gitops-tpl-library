@@ -2,7 +2,7 @@
 
 [Compatibility](https://github.com/grootan-devops/ai-skills/blob/main/COMPATIBILITY.md) · [Security](./SECURITY.md) · [Reporting policy](./CONTRIBUTING.md)
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 Helm tpl library for gitops repo
 
@@ -19,11 +19,11 @@ helm registry login registry.contoso.com --username <registry-username> --passwo
 # Chart.yaml
 apiVersion: v2
 name: <product-prefix>
-version: 1.0.0
+version: 1.1.0
 type: application
 dependencies:
   - name: argocd-gitops-tpl-library
-    version: 1.0.0
+    version: 1.1.0
     repository: oci://registry.contoso.com/helm
 ```
 
