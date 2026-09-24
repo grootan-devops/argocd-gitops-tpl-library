@@ -2,6 +2,8 @@ name: CI · PR Verification
 run-name: "CI · PR Verification · ${{ github.event_name }} · ${{ github.sha }}"
 
 on:
+  push:
+    branches: [dev]
   pull_request:
     branches: [main]
   merge_group:
