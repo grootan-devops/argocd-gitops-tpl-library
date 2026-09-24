@@ -1,13 +1,24 @@
-# Enable/Disable Global ArgoCD Application
+# Enable or disable all generated Argo CD Applications.
 enabled: true
 
-# Global naming inputs                                                          # Application prefix
-environment: sample                                                             # Environment suffix
-project: default                                                                # ArgoCD Project Name
-server: in-cluster                                                              # ArgoCD Cluster
-repoURL: https://gitlab.com/gitops.git  # Git source for Application manifests (excluding extras)
-branch: sample                                                                  # Git Repo Branch
-preserveResourcesOnDeletion: false                                              # Removes finalizers
+# Required cluster name segment in generated Application names.
+cluster: midgard
+# Optional environment suffix; leave empty to omit it from names.
+environment: sample
+# Argo CD Project and registered destination cluster name.
+project: default
+server: in-cluster
+# Git clone URL for Application manifests (excluding extras).
+repoURL: https://gitlab.com/gitops.git
+# Optional source revision. When empty, it defaults to
+# Chart.Name/environment or Chart.Name.
+branch: ""
+# When true, omit finalizers and preserve resources on deletion.
+preserveResourcesOnDeletion: false
+# Keep false; reconcile raw manifests through generated Extras Applications.
+renderExtrasManifests: false
+# Optional workload namespace; defaults to Chart.Name-environment or Chart.Name.
+namespace: ""
 
 # Global sync policy fallback for all apps
 sync:
@@ -104,7 +115,7 @@ apps:
         options: []
         retry: {}
 
-    # It will look for 'values/groupa/sample3/' and it should be a valid helm directory
+    # Looks for 'values/groupa/sample3/', which must be a valid Helm directory.
     sample3:
       enabled: true
       namespace: sample3

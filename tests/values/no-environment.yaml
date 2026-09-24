@@ -1,0 +1,6 @@
+environment: ""
+branch: ""
+namespace: ""
+apps:
+  api:
+    namespace: ""

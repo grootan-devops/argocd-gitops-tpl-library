@@ -1,0 +1,127 @@
+suite: Argo CD Extras contract
+templates:
+  - templates/extras.yaml
+tests:
+  - it: renders an app with the configured cluster and environment
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-extras-clamav-dev
+      - equal:
+          path: spec.source.targetRevision
+          value: payments/dev
+      - equal:
+          path: spec.source.path
+          value: extras/manifests/clamav
+      - equal:
+          path: spec.destination.name
+          value: in-cluster
+      - equal:
+          path: spec.destination.namespace
+          value: contoso-dev
+      - equal:
+          path: spec.source.repoURL
+          value: https://github.com/contoso/platform-gitops.git
+      - equal:
+          path: spec.project
+          value: developer
+      - equal:
+          path: spec.syncPolicy.automated.prune
+          value: true
+      - equal:
+          path: spec.syncPolicy.retry.limit
+          value: 5
+
+  - it: omits environment and defaults branch and namespace from the chart
+    values:
+      - ../values/no-environment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-extras-clamav
+      - equal:
+          path: spec.source.targetRevision
+          value: contoso
+      - equal:
+          path: spec.destination.namespace
+          value: contoso
+
+  - it: applies folder sync overrides without inferring environment from branch
+    values:
+      - ../values/overrides.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-extras-clamav
+      - equal:
+          path: spec.project
+          value: extras-project
+      - equal:
+          path: spec.source.targetRevision
+          value: releases/prod
+      - equal:
+          path: spec.destination.namespace
+          value: extras-ns
+      - equal:
+          path: spec.destination.name
+          value: qa-cluster
+      - exists:
+          path: metadata.finalizers
+      - notExists:
+          path: spec.syncPolicy.automated
+      - contains:
+          path: spec.syncPolicy.syncOptions
+          content: Validate=false
+      - contains:
+          path: spec.syncPolicy.syncOptions
+          content: CreateNamespace=false
+      - equal:
+          path: spec.syncPolicy.retry.limit
+          value: 8
+      - equal:
+          path: spec.ignoreDifferences[0].jsonPointers[0]
+          value: /spec/replicas
+      - equal:
+          path: spec.ignoreDifferences[1].jsonPointers[0]
+          value: /spec/ingressClassName
+
+  - it: uses extras-wide sync defaults when a folder has no override
+    values:
+      - ../values/extras-defaults.yaml
+    asserts:
+      - equal:
+          path: spec.syncPolicy.automated.prune
+          value: true
+      - equal:
+          path: spec.syncPolicy.automated.selfHeal
+          value: true
+      - contains:
+          path: spec.syncPolicy.syncOptions
+          content: CreateNamespace=false
+      - equal:
+          path: spec.syncPolicy.retry.limit
+          value: 3
+      - equal:
+          path: spec.ignoreDifferences[0].jsonPointers[0]
+          value: /status
+
+  - it: disables all manifest-folder applications through extras.enabled
+    set:
+      extras.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: keeps root-level manifest files out of generated Applications
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-extras-clamav-dev

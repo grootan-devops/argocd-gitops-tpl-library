@@ -1,0 +1,7 @@
+branch: ""
+namespace: ""
+apps:
+  api:
+    namespace: ""
+    chart:
+      path: charts/payment-api

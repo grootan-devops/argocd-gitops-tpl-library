@@ -62,7 +62,7 @@ jobs:
       chart-repository: ${{ needs.init.outputs.chart-push-repository }}
       check-docs: false
       run-unittest: true
-      mock-chart: test
+      mock-chart: "tests tests/extras"
       chart-dir: "."
       publish-candidate: false
 

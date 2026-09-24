@@ -1,4 +1,7 @@
 {{- define "tpl.argocd.applications" }}
+  {{- if .Values.renderExtrasManifests }}
+    {{- fail "renderExtrasManifests must remain false: raw manifests are reconciled through the generated Extras Applications" }}
+  {{- end }}
   {{- $ctx := . }}
   {{- if .Values.apps }}
     {{- range $rootName, $rootApp := .Values.apps }}

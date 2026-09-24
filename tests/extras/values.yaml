@@ -1,0 +1,32 @@
+enabled: true
+cluster: midgard
+environment: dev
+project: developer
+server: in-cluster
+repoURL: https://github.com/contoso/platform-gitops.git
+branch: payments/dev
+namespace: ""
+preserveResourcesOnDeletion: false
+sync:
+  options:
+    - Validate=true
+    - CreateNamespace=true
+  retry:
+    limit: 5
+    backoff:
+      duration: 5s
+      factor: 2
+      maxDuration: 3m
+  ignoreDifferences: []
+notification: {}
+extras:
+  enabled: true
+  sync:
+    automated:
+      prune: true
+      selfHeal: true
+    options: []
+    retry: {}
+apps:
+  clamav:
+    enabled: true

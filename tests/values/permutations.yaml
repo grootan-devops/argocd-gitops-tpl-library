@@ -3,7 +3,7 @@
 enabled: true
 environment: prod
 project: overrides-project
-server: https://kubernetes.example.invalid
+server: dev-cluster
 namespace: platform-default
 repoURL: https://github.com/contoso/platform-gitops.git
 branch: releases/prod
@@ -19,6 +19,11 @@ sync:
       duration: 5s
       factor: 2
       maxDuration: 3m
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /status
 notification:
   teams:
     template: release-status

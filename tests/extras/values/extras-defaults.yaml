@@ -1,0 +1,15 @@
+extras:
+  enabled: true
+  sync:
+    automated:
+      prune: true
+      selfHeal: true
+    options:
+      - CreateNamespace=false
+    retry:
+      limit: 3
+    ignoreDifferences:
+      - group: apps
+        kind: Deployment
+        jsonPointers:
+          - /status

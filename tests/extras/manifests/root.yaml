@@ -1,0 +1,7 @@
+# Negative fixture: files at the manifests root are intentionally ignored.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ignored-root-manifest
+data:
+  should-not-render: "true"
