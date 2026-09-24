@@ -2,6 +2,8 @@ name: CI · PR Verification
 run-name: "CI · PR Verification · ${{ github.event_name }} · ${{ github.sha }}"
 
 on:
+  push:
+    branches: [dev]
   pull_request:
     branches: [main]
   merge_group:
@@ -62,9 +64,42 @@ jobs:
       chart-repository: ${{ needs.init.outputs.chart-push-repository }}
       check-docs: false
       run-unittest: true
-      mock-chart: test
+      mock-chart: "tests"
       chart-dir: "."
       publish-candidate: false
+
+  chart-extras-unittest:
+    name: Chart / Extras Unit Test
+    needs: init
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-26.04' }}
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    container:
+      image: grootantech/toolkit:1.0.0
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Update Extras Test Chart Dependencies
+        run: helm dependency update tests/extras
+
+      - name: Run Extras helm-unittest
+        run: |
+          set -o pipefail
+          helm unittest --strict \
+            --output-type JUnit \
+            --output-file "${RUNNER_TEMP}/extras-unittest-report.xml" \
+            tests/extras
+
+      - name: Upload Extras Unit Test Report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: chart-extras-unittest-report
+          path: ${{ runner.temp }}/extras-unittest-report.xml
+          if-no-files-found: warn
+          retention-days: 7
 
   secret-scan:
     uses: grootan-devops/github-ci-library/.github/workflows/secret-scanning.yml@1.0.0

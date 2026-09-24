@@ -1,9 +1,11 @@
 enabled: true
+cluster: midgard
 environment: dev
-project: contoso
+project: developer
 server: in-cluster
 repoURL: https://github.com/contoso/platform-gitops.git
 branch: payments/dev
+namespace: ""
 preserveResourcesOnDeletion: false
 renderExtrasManifests: false
 sync:

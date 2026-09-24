@@ -77,3 +77,32 @@
 
 {{- $finalList | toYaml -}}
 {{- end -}}
+
+{{- define "tpl.argocd.applicationName" -}}
+{{- $parts := list .chartName .cluster -}}
+{{- range .segments -}}
+  {{- if . -}}
+    {{- $parts = append $parts . -}}
+  {{- end -}}
+{{- end -}}
+{{- if .environment -}}
+  {{- $parts = append $parts .environment -}}
+{{- end -}}
+{{- join "-" $parts | trunc 253 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "tpl.argocd.targetRevision" -}}
+{{- $default := .Chart.Name -}}
+{{- if .Values.environment -}}
+  {{- $default = printf "%s/%s" .Chart.Name .Values.environment -}}
+{{- end -}}
+{{- .Values.branch | default $default -}}
+{{- end -}}
+
+{{- define "tpl.argocd.defaultNamespace" -}}
+{{- if .Values.environment -}}
+  {{- printf "%s-%s" .Chart.Name .Values.environment -}}
+{{- else -}}
+  {{- .Chart.Name -}}
+{{- end -}}
+{{- end -}}

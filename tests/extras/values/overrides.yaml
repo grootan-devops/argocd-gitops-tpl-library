@@ -1,0 +1,42 @@
+# Exercises folder-level enablement, namespace overrides, and sync precedence.
+environment: ""
+project: extras-project
+server: qa-cluster
+namespace: extras-ns
+branch: releases/prod
+preserveResourcesOnDeletion: false
+sync:
+  options:
+    - Validate=true
+    - CreateNamespace=true
+  retry:
+    limit: 5
+extras:
+  enabled: true
+  sync:
+    automated:
+      prune: false
+      selfHeal: true
+    options:
+      - CreateNamespace=false
+    retry:
+      limit: 3
+apps:
+  clamav:
+    enabled: true
+    ignoreDifferences:
+      - group: apps
+        kind: Deployment
+        jsonPointers:
+          - /spec/replicas
+    sync:
+      automated: {}
+      options:
+        - Validate=false
+      retry:
+        limit: 8
+      ignoreDifferences:
+        - group: networking.k8s.io
+          kind: Ingress
+          jsonPointers:
+            - /spec/ingressClassName

@@ -35,5 +35,5 @@ Makefile
 SECURITY.md
 VERSION
 .github/
-test/
+tests/
 gitops

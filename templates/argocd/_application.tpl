@@ -1,31 +1,22 @@
 {{- define "tpl.argocd.application" }}
 ---
 {{- if $.Values.enabled }}
+{{- $cluster := required "values.cluster is required to generate Argo CD application names" $.Values.cluster }}
 {{- $isEnabled := true }}
 {{- if hasKey .appName "enabled" }}
   {{- $isEnabled = .appName.enabled }}
 {{- end }}
 {{- if $isEnabled }}
-{{- $display := "" }}
-{{- if (.extras) }}
-{{- $display = "extras" }}
+{{- $nameSegments := list }}
+{{- if .extras }}
+  {{- $nameSegments = append $nameSegments "extras" }}
 {{- else }}
-{{- $display = include "util.displayName" . }}
-{{- end }}
-{{- $appName := "" }}
-{{- if or (eq .rootApp .Chart.Name) (.extras) (not .rootApp) (eq .rootApp "") }}
-  {{- if .Values.environment }}
-  {{- $appName = printf "%s-%s-%s" .Chart.Name $display .Values.environment }}
-  {{- else }}
-  {{- $appName = printf "%s-%s" .Chart.Name $display }}
+  {{- if and .rootApp (ne .rootApp .Chart.Name) }}
+    {{- $nameSegments = append $nameSegments (include "util.kebabcase" .rootApp) }}
   {{- end }}
-{{- else }}
-  {{- if .Values.environment }}
-  {{- $appName = printf "%s-%s-%s-%s" .Chart.Name .rootApp $display .Values.environment }}
-  {{- else }}
-  {{- $appName = printf "%s-%s-%s" .Chart.Name .rootApp $display }}
-  {{- end }}
+  {{- $nameSegments = append $nameSegments (include "util.displayName" .) }}
 {{- end }}
+{{- $appName := include "tpl.argocd.applicationName" (dict "chartName" .Chart.Name "cluster" $cluster "segments" $nameSegments "environment" .Values.environment) }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -58,8 +49,11 @@ spec:
     {{- include "util.mergeSyncOptions" (dict "global" $globalOptions "app" $appOptions) | nindent 6 }}
     retry: {{ $appSync.retry | default .Values.sync.retry | toYaml | nindent 6 }}
   revisionHistoryLimit: 3
-  {{- if (.appName).ignoreDifferences }}
-  ignoreDifferences: {{ (.appName).ignoreDifferences | toYaml | nindent 4 }}
+  {{- $globalIgnoreDifferences := $.Values.sync.ignoreDifferences | default list }}
+  {{- $appIgnoreDifferences := (.appName).ignoreDifferences | default list }}
+  {{- $ignoreDifferences := concat $globalIgnoreDifferences $appIgnoreDifferences }}
+  {{- if $ignoreDifferences }}
+  ignoreDifferences: {{ $ignoreDifferences | toYaml | nindent 4 }}
   {{- end }}
 {{- end }}
 {{- end }}
@@ -68,10 +62,10 @@ spec:
 {{- define "tpl.argocd.application.extras.app" }}
 source:
   repoURL: {{ $.Values.repoURL }}
-  targetRevision: {{ $.Values.branch }}
+  targetRevision: {{ include "tpl.argocd.targetRevision" $ }}
   path: extras
 destination:
-  name: in-cluster
+  name: {{ $.Values.server }}
   namespace: argo-cd
 {{- end }}
 
@@ -79,6 +73,8 @@ destination:
 {{- $rootApp := .rootApp }}
 {{- $name := .name }}
 {{- $displayName := include "util.displayName" . }}
+{{- $targetRevision := include "tpl.argocd.targetRevision" $ }}
+{{- $defaultNamespace := include "tpl.argocd.defaultNamespace" $ }}
 
 {{- $chartRaw := (.appName).chart }}
 {{- $chart := $chartRaw }}
@@ -92,7 +88,7 @@ destination:
 {{- $releaseName := (.appName).releaseName | default .name | toString }}
 source:
   repoURL: {{ $.Values.repoURL }}
-  targetRevision: {{ $.Values.branch }}
+  targetRevision: {{ $targetRevision }}
   path: {{ $chart.path }}
   helm:
     valueFiles:
@@ -134,20 +130,26 @@ source:
 destination:
   name: {{ .Values.server }}
   {{- if .Values.environment }}
-  namespace: {{ (.appName).namespace | default .groupNamespace | default .Values.namespace | default (.Values.branch | replace "/" "-") }}
+  namespace: {{ (.appName).namespace | default .groupNamespace | default .Values.namespace | default $defaultNamespace }}
   {{- else }}
-  namespace: {{ (.appName).namespace | default .groupNamespace | default .Values.namespace | default $chartName | default (.Values.branch | replace "/" "-") }}
+  namespace: {{ (.appName).namespace | default .groupNamespace | default .Values.namespace | default $defaultNamespace }}
   {{- end }}
 {{- end }}
 
 {{- define "tpl.argocd.application.extras" }}
 ---
 {{- $base := "manifests" }}
+{{- $cluster := required "values.cluster is required to generate Argo CD application names" $.Values.cluster }}
+{{- $targetRevision := include "tpl.argocd.targetRevision" $ }}
+{{- $defaultNamespace := include "tpl.argocd.defaultNamespace" $ }}
 {{- $seen := dict }}
-{{- $rootFilesExist := .Files.Glob (printf "%s/*.yaml" $base) }}
-{{- $chartBase := regexReplaceAll "-extras(-.*)?$" $.Chart.Name "" }}
-{{- $env := $.Values.environment | default (splitList "/" ($.Values.branch | default "") | last) }}
+{{- $extrasConfig := $.Values.extras | default dict }}
+{{- $extrasEnabled := true }}
+{{- if hasKey $extrasConfig "enabled" }}
+  {{- $extrasEnabled = $extrasConfig.enabled }}
+{{- end }}
 
+{{/* Root-level manifests have no directory identity and intentionally create no Application. */}}
 {{- range $file, $_ := .Files.Glob (printf "%s/**/*.yaml" $base) }}
   {{- $dir := dir $file }}
   {{- if ne $dir $base }}
@@ -166,15 +168,16 @@ destination:
         {{- $isEnabled = $extraValues.enabled }}
       {{- end }}
 
-      {{- if $isEnabled }}
+      {{- if and $isEnabled $extrasEnabled }}
+{{- $extrasSync := $extrasConfig.sync | default dict }}
+{{- $extraSync := $extraValues.sync | default dict }}
+{{- $globalSync := $.Values.sync | default dict }}
+{{- $ignoreDifferences := concat ($globalSync.ignoreDifferences | default list) ($extrasSync.ignoreDifferences | default list) ($extraValues.ignoreDifferences | default list) ($extraSync.ignoreDifferences | default list) }}
+{{- $applicationName := include "tpl.argocd.applicationName" (dict "chartName" $.Chart.Name "cluster" $cluster "segments" (list "extras" $appNameSuffix) "environment" $.Values.environment) }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  {{- if $env }}
-  name: {{ printf "%s-extras-%s-%s" $chartBase $env $appNameSuffix }}
-  {{- else }}
-  name: {{ printf "%s-extras-%s" $chartBase $appNameSuffix }}
-  {{- end }}
+  name: {{ $applicationName }}
   namespace: argo-cd
   {{- if not (default false $.Values.preserveResourcesOnDeletion) }}
   finalizers:
@@ -185,14 +188,17 @@ spec:
   project: {{ $.Values.project }}
   source:
     repoURL: {{ $.Values.repoURL }}
-    targetRevision: {{ $.Values.branch }}
+    targetRevision: {{ $targetRevision }}
     path: {{ printf "extras/%s/%s" $base $relDir }}
   destination:
     name: {{ $.Values.server }}
-    namespace: {{ $.Values.namespace | default ($.Values.branch | replace "/" "-") }}
+    namespace: {{ $.Values.namespace | default $defaultNamespace }}
   revisionHistoryLimit: 3
   syncPolicy:
     {{- $autoConfig := dict "prune" true "selfHeal" true }}
+    {{- if hasKey $extrasSync "automated" }}
+      {{- $autoConfig = $extrasSync.automated }}
+    {{- end }}
     {{- if and (hasKey $extraValues "sync") (hasKey $extraValues.sync "automated") }}
       {{- $autoConfig = $extraValues.sync.automated }}
     {{- end }}
@@ -200,54 +206,24 @@ spec:
     automated: {{- toYaml $autoConfig | nindent 6 }}
     {{- end }}
 
-    {{- $appOptions := ($extraValues.sync | default dict).options | default list }}
-    {{- $globalOptions := $.Values.sync.options | default list }}
+    {{- $appOptions := $extraSync.options | default list }}
+    {{- $globalOptions := concat ($globalSync.options | default list) ($extrasSync.options | default list) }}
     syncOptions:
     {{- include "util.mergeSyncOptions" (dict "global" $globalOptions "app" $appOptions) | nindent 6 }}
 
-    retry: {{ ($extraValues.sync | default dict).retry | default $.Values.sync.retry | toYaml | nindent 6 }}
+    {{- $retry := $globalSync.retry | default dict }}
+    {{- if $extrasSync.retry }}
+      {{- $retry = $extrasSync.retry }}
+    {{- end }}
+    {{- $retry = $extraSync.retry | default $retry }}
+    retry: {{ $retry | toYaml | nindent 6 }}
+  {{- if $ignoreDifferences }}
+  ignoreDifferences: {{ $ignoreDifferences | toYaml | nindent 4 }}
+  {{- end }}
 ---
       {{- end }}
     {{- end }}
-  {{- end }}
 {{- end }}
-
-{{- if $rootFilesExist }}
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  {{- if $env }}
-  name: {{ printf "%s-extras-%s-root" $chartBase $env }}
-  {{- else }}
-  name: {{ printf "%s-extras-root" $chartBase }}
-  {{- end }}
-  namespace: argo-cd
-  {{- if not (default false $.Values.preserveResourcesOnDeletion) }}
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-  {{- end }}
-  {{- include "tpl.argocd.application.annotations" $ | nindent 2 }}
-spec:
-  project: {{ $.Values.project }}
-  source:
-    repoURL: {{ $.Values.repoURL }}
-    targetRevision: {{ $.Values.branch }}
-    path: {{ printf "extras/%s" $base }}
-    directory:
-      recurse: false
-      include: "*.yaml"
-  destination:
-    name: {{ $.Values.server }}
-    namespace: {{ $.Values.namespace | default ($.Values.branch | replace "/" "-") }}
-  revisionHistoryLimit: 3
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    {{- $.Values.sync.options | toYaml | nindent 6 }}
-    retry: {{ $.Values.sync.retry | toYaml | nindent 6 }}
----
 {{- end }}
 {{- end }}
 
