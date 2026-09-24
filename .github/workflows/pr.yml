@@ -81,23 +81,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v7
 
-      - name: Checkout CI Library
-        uses: actions/checkout@v7
-        with:
-          repository: grootan-devops/github-ci-library
-          ref: 1.0.0
-          path: .ci-library
-          token: ${{ secrets.CI_LIBRARY_TOKEN || github.token }}
-
-      - name: Authenticate Chart Dependencies
-        env:
-          CHART_REGISTRY_USERNAME: ${{ secrets.CHART_REGISTRY_USERNAME }}
-          CHART_REGISTRY_PASSWORD: ${{ secrets.CHART_REGISTRY_PASSWORD }}
-          CHART_DEPENDENCY_REGISTRY: ${{ vars.CHART_DEPENDENCY_REGISTRY }}
-          CHART_DEPENDENCY_REGISTRY_USERNAME: ${{ secrets.CHART_DEPENDENCY_REGISTRY_USERNAME }}
-          CHART_DEPENDENCY_REGISTRY_PASSWORD: ${{ secrets.CHART_DEPENDENCY_REGISTRY_PASSWORD }}
-        run: bash "${GITHUB_WORKSPACE}/.ci-library/scripts/chart/registry.sh" dependencies
-
       - name: Update Extras Test Chart Dependencies
         run: helm dependency update tests/extras
 
