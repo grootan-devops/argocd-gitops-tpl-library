@@ -34,7 +34,7 @@ version: 1.0.0
 appVersion: "1.0.0"
 dependencies:
   - name: argocd-gitops-tpl-library
-    version: 1.2.0 # replace with the latest stable published release
+    version: 1.3.0 # replace with the latest stable published release
     repository: oci://registry-1.docker.io/grootantech
 ```
 

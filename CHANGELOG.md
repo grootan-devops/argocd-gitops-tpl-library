@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-09-25
+
+### Changed
+
+- Bumped container image in `.github/workflows/pr.yml` to `grootantech/toolkit:1.1.0`.
+- Pinned repository CI reusable workflow callers to `github-ci-library` `@1.3.1`.
+- Bumped chart release version to `1.3.0` across Chart.yaml, tests, and documentation.
+
 ## [1.2.0] - 2026-09-24
 
 ### Changed
@@ -18,8 +26,6 @@ this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Apply `extras.enabled` and `extras.sync` defaults in the extras chart while preserving per-directory overrides and top-level sync compatibility.
 - Reject `renderExtrasManifests: true`; raw manifests are managed only through named-directory Extras Applications.
 - Document the cluster-first root Application naming convention and two-chart consumer layout in focused guides.
-- Bumped container image in `.github/workflows/pr.yml` to `grootantech/toolkit:1.1.0`.
-- Pinned repository CI reusable workflow callers to `github-ci-library` `@1.3.1`.
 
 ## [1.1.0] - 2026-09-22
 

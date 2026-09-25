@@ -3,6 +3,10 @@
 This document records required consumer actions when upgrading between releases.
 Breaking changes must include an entry before release.
 
+## 1.3.0
+
+No consumer migration required. Chart CI and verification container images upgraded to `grootantech/toolkit:1.1.0` and reusable workflow callers pinned to `github-ci-library` `@1.3.1`.
+
 ## 1.2.0
 
 ### Breaking Changes
