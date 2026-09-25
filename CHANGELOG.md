@@ -18,6 +18,8 @@ this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Apply `extras.enabled` and `extras.sync` defaults in the extras chart while preserving per-directory overrides and top-level sync compatibility.
 - Reject `renderExtrasManifests: true`; raw manifests are managed only through named-directory Extras Applications.
 - Document the cluster-first root Application naming convention and two-chart consumer layout in focused guides.
+- Bumped container image in `.github/workflows/pr.yml` to `grootantech/toolkit:1.1.0`.
+- Pinned repository CI reusable workflow callers to `github-ci-library` `@1.3.1`.
 
 ## [1.1.0] - 2026-09-22
 
