@@ -5,12 +5,14 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.0] - 2026-09-25
+## [1.3.0] - 2026-09-26
 
 ### Changed
 
 - Bumped container image in `.github/workflows/pr.yml` to `grootantech/toolkit:1.1.0`.
-- Pinned repository CI reusable workflow callers to `github-ci-library` `@1.3.1`.
+- Pinned repository CI reusable workflow callers to `github-ci-library` `@1.4.0`.
+- Enabled candidate chart publishing in CI (`publish-candidate: true`).
+- Added manual workflow dispatch and enabled push-triggered chart release on `main`.
 - Bumped chart release version to `1.3.0` across Chart.yaml, tests, and documentation.
 
 ## [1.2.0] - 2026-09-24
