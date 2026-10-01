@@ -3,6 +3,30 @@
 This document records required consumer actions when upgrading between releases.
 Breaking changes must include an entry before release.
 
+To upgrade, apply every section after your pinned version up to the target, oldest first.
+Newer sections are split into **Required** (the upgrade breaks or misbehaves without it),
+**Recommended** (aligns an existing environment with the current standards) and **Verify**.
+
+## 1.4.0
+
+### Required
+
+No migration required. The templates, values and generated Application names are unchanged;
+this release documents the `apps` registry, the environment starter files and the GitOps
+README convention.
+
+### Recommended
+
+- Record the cluster label and the Argo CD cluster name in the GitOps repository's
+  default-branch README, as the root Application guide shows.
+- Keep only what differs per environment in each `values/` file, as listed under what a values
+  file overrides; a setting every environment needs belongs in the service chart.
+
+### Verify
+
+- `helm template` on the root chart and on `extras/` renders the same Application names as
+  before the upgrade.
+
 ## 1.3.0
 
 No consumer migration required. Chart CI and verification container images upgraded to `grootantech/toolkit:1.1.0` and reusable workflow callers pinned to `github-ci-library` `@1.4.0`.
