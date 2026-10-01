@@ -2,7 +2,7 @@
 
 [Compatibility](https://github.com/grootan-devops/ai-skills/blob/main/COMPATIBILITY.md) · [Security](./SECURITY.md) · [Reporting policy](./CONTRIBUTING.md)
 
-![Version: 1.3.0](https://img.shields.io/badge/Version-1.3.0-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 1.3.0](https://img.shields.io/badge/AppVersion-1.3.0-informational?style=flat-square)
+![Version: 1.4.0](https://img.shields.io/badge/Version-1.4.0-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 1.4.0](https://img.shields.io/badge/AppVersion-1.4.0-informational?style=flat-square)
 
 Helm tpl library for gitops repo
 
@@ -22,7 +22,7 @@ version: 1.0.0
 appVersion: "1.0.0"
 dependencies:
   - name: argocd-gitops-tpl-library
-    version: 1.3.0
+    version: 1.4.0
     repository: oci://registry-1.docker.io/grootantech
 ```
 
@@ -44,11 +44,16 @@ need:
 
 | Task | Guide |
 | --- | --- |
-| Bootstrap a root and extras consumer chart | [Getting started](./docs/getting-started.md) |
+| Bootstrap a root and extras consumer chart from the starter files | [Getting started](./docs/getting-started.md) |
 | Configure app names, namespaces, branches, and sync policy | [Configuration](./docs/configuration.md) |
+| Add a service to an environment and write its values file | [Helm Applications](./docs/configuration.md#helm-applications-apps) |
 | Add raw manifests and understand Extras Applications | [Extras manifests](./docs/extras.md) |
 | Create the Argo CD root Application | [Root Application](./docs/root-application.md) |
 | Run chart and unit-test verification | [Testing](./docs/testing.md) |
+| Upgrade an existing environment | [Migration guide](./MIGRATION.md) · [Changelog](./CHANGELOG.md) |
+
+For AI-assisted work, read this index first and follow only the relevant task links.
+Resolve links against the same branch, tag or local checkout; do not load all guides by default.
 
 ## Naming at a glance
 
