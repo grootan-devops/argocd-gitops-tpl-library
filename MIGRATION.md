@@ -7,6 +7,16 @@ To upgrade, apply every section after your pinned version up to the target, olde
 Newer sections are split into **Required** (the upgrade breaks or misbehaves without it),
 **Recommended** (aligns an existing environment with the current standards) and **Verify**.
 
+## 1.6.0
+
+### Required
+
+Update the library pin in both consumer `Chart.yaml` files to `1.6.0` and rebuild
+their dependencies. Keep the existing `cluster` value to preserve Application names.
+Omitting or emptying it changes those names; review the resulting renames and
+resource-finalizer behavior before syncing. The destination cluster is still
+selected separately through `server`.
+
 ## 1.5.0
 
 ### Required

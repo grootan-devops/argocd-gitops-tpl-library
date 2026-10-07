@@ -34,7 +34,7 @@ version: 1.0.0
 appVersion: "1.0.0"
 dependencies:
   - name: argocd-gitops-tpl-library
-    version: 1.5.0 # replace with the latest stable published release
+    version: 1.6.0 # replace with the latest stable published release
     repository: oci://registry-1.docker.io/grootantech
 ```
 
@@ -122,7 +122,7 @@ dependencies:
 
 ```yaml
 enabled: true
-cluster: <cluster>
+cluster: "" # optional naming segment; set to your cluster label if needed
 environment: <environment>
 project: developer
 server: <argocd-cluster-name>

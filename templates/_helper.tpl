@@ -79,7 +79,10 @@
 {{- end -}}
 
 {{- define "tpl.argocd.applicationName" -}}
-{{- $parts := list .chartName .cluster -}}
+{{- $parts := list .chartName -}}
+{{- if .cluster -}}
+  {{- $parts = append $parts .cluster -}}
+{{- end -}}
 {{- range .segments -}}
   {{- if . -}}
     {{- $parts = append $parts . -}}

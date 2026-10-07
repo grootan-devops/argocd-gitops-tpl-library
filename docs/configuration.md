@@ -7,7 +7,7 @@ Set these fields in both root `values.yaml` and `extras/values.yaml`:
 | Field | Required | Behavior |
 | --- | --- | --- |
 | `enabled` | No | Global switch for the root chart's generated Applications; defaults to `true`. |
-| `cluster` | Yes | Cluster name segment in generated names. Rendering fails when it is empty. |
+| `cluster` | No | Optional name segment. Omit it or set it to an empty string to exclude it from generated names. |
 | `environment` | No | Optional suffix; an empty value removes it and is never inferred from the branch. |
 | `project` | No | Argo CD Project for generated child Applications; the library default is `default`. |
 | `server` | Yes for destinations | Argo CD destination cluster name (the `NAME` column in `argocd cluster list`). |
@@ -17,8 +17,11 @@ Set these fields in both root `values.yaml` and `extras/values.yaml`:
 | `preserveResourcesOnDeletion` | No | `true` omits the resource finalizer; default `false` allows pruning on Application deletion. |
 
 The root and extras charts must share the same project-only `Chart.Name`. Generated Helm app
-names follow `<Chart.Name>-<cluster>-<app-path>[-<environment>]`; each raw-manifest folder
-uses `<Chart.Name>-<cluster>-extras-<folder>[-<environment>]`.
+names follow `<Chart.Name>[-<cluster>]-<app-path>[-<environment>]`; each raw-manifest folder
+uses `<Chart.Name>[-<cluster>]-extras-<folder>[-<environment>]`.
+For example, omitting `cluster` produces `contoso-api-dev` and
+`contoso-extras-clamav-dev`. This does not change `destination.name`, release names,
+branches or namespaces.
 
 ## Root chart values
 
@@ -98,9 +101,9 @@ apps:
 
 | Entry | Values file | Application name |
 | --- | --- | --- |
-| `apps.<key>` with `chart` | `values/<key>.yaml` | `<Chart.Name>-<cluster>-<key>[-<environment>]` |
-| `apps.<group>.<release>` | `values/<group>/<release>.yaml` | `<Chart.Name>-<cluster>-<group>-<release>[-<environment>]` |
-| `apps.<group>.<a>.<b>` | `values/<group>/<a>/<b>.yaml` | `<Chart.Name>-<cluster>-<group>-<a>-<b>[-<environment>]` |
+| `apps.<key>` with `chart` | `values/<key>.yaml` | `<Chart.Name>[-<cluster>]-<key>[-<environment>]` |
+| `apps.<group>.<release>` | `values/<group>/<release>.yaml` | `<Chart.Name>[-<cluster>]-<group>-<release>[-<environment>]` |
+| `apps.<group>.<a>.<b>` | `values/<group>/<a>/<b>.yaml` | `<Chart.Name>[-<cluster>]-<group>-<a>-<b>[-<environment>]` |
 
 - **Keys.** A map without `chart` is a group. Keys and release names are converted to
   kebab-case in names and file paths; the group directory is used exactly as the group key is

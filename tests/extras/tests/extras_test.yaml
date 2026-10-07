@@ -2,6 +2,30 @@ suite: Argo CD Extras contract
 templates:
   - templates/extras.yaml
 tests:
+  - it: omits an empty cluster from manifest-folder names
+    set:
+      cluster: ""
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: contoso-extras-clamav-dev
+      - equal:
+          path: spec.destination.name
+          value: in-cluster
+
+  - it: renders a manifest-folder app without cluster or environment
+    set:
+      cluster: null
+      environment: ""
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: contoso-extras-clamav
+
   - it: renders an app with the configured cluster and environment
     asserts:
       - hasDocuments:

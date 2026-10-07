@@ -4,6 +4,23 @@ templates:
 values:
   - fixtures/plugin.yaml
 tests:
+  - it: renders a plugin Application without a cluster label
+    set:
+      cluster: null
+      apps.plugin-contract.plugin.name: kustomized-helm
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: contoso-plugin-contract-dev
+      - equal:
+          path: spec.source.plugin.env[0].value
+          value: plugin-release
+      - equal:
+          path: spec.destination.name
+          value: in-cluster
+
   - it: retains native Helm when plugin is absent
     asserts:
       - hasDocuments:

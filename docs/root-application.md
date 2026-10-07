@@ -4,14 +4,16 @@ The bootstrap Application watches the GitOps repository's root chart. Its name i
 from the generated child names:
 
 ```text
-<cluster>-<project>-<environment>-root
-<cluster>-<project>-root                 # if no environment is configured
+[<cluster>-]<project>-<environment>-root
+[<cluster>-]<project>-root                 # if no environment is configured
 ```
 
 For example, cluster `lab`, project/chart `contoso`, and environment `dev` produce
 `lab-contoso-dev-root`. Put the environment, Argo CD URL, project name, GitOps repository,
 target branch, cluster/server names, and derived root Application name in the consumer README.
-Do not put credentials there.
+Do not put credentials there. When `cluster` is omitted or empty, use
+`contoso-dev-root` (or `contoso-root` without an environment). The bootstrap name
+is set manually; the library does not rename that Application.
 
 The GitOps repository's default-branch `README.md` records both identities:
 

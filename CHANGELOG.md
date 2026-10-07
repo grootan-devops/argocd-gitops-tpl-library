@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-10-07
+
+### Changed
+
+- Make `cluster` optional for Helm, CMP and Extras Applications. Omitted or empty values remove the cluster name segment; configured cluster names retain their existing output. Destination clusters, release names, namespaces and target revisions are unchanged.
+- Default the example cluster label to an empty string and document naming with and without a cluster.
+
 ## [1.5.0] - 2026-10-07
 
 ### Added

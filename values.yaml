@@ -1,8 +1,8 @@
 # Enable or disable all generated Argo CD Applications.
 enabled: true
 
-# Required cluster name segment in generated Application names.
-cluster: midgard
+# Optional cluster name segment; leave empty or omit to exclude it from names.
+cluster: ""
 # Optional environment suffix; leave empty to omit it from names.
 environment: sample
 # Argo CD Project and registered destination cluster name.
