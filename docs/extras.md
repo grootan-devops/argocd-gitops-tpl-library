@@ -14,7 +14,7 @@ extras/manifests/
 ```
 
 The generated Application points to `extras/manifests/<directory>` and uses
-`<Chart.Name>-<cluster>-extras-<directory>[-<environment>]`. Use `.yaml` filenames, because
+`<Chart.Name>[-<cluster>]-extras-<directory>[-<environment>]`. Use `.yaml` filenames, because
 the library's discovery glob is `**/*.yaml`.
 
 The extras chart must have the same `Chart.Name` as the root chart and its own

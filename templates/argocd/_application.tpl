@@ -1,7 +1,7 @@
 {{- define "tpl.argocd.application" }}
 ---
 {{- if $.Values.enabled }}
-{{- $cluster := required "values.cluster is required to generate Argo CD application names" $.Values.cluster }}
+{{- $cluster := $.Values.cluster | default "" }}
 {{- $isEnabled := true }}
 {{- if hasKey .appName "enabled" }}
   {{- $isEnabled = .appName.enabled }}
@@ -150,7 +150,7 @@ destination:
 {{- define "tpl.argocd.application.extras" }}
 ---
 {{- $base := "manifests" }}
-{{- $cluster := required "values.cluster is required to generate Argo CD application names" $.Values.cluster }}
+{{- $cluster := $.Values.cluster | default "" }}
 {{- $targetRevision := include "tpl.argocd.targetRevision" $ }}
 {{- $defaultNamespace := include "tpl.argocd.defaultNamespace" $ }}
 {{- $seen := dict }}

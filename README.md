@@ -2,13 +2,13 @@
 
 [Compatibility](https://github.com/grootan-devops/ai-skills/blob/main/COMPATIBILITY.md) · [Security](./SECURITY.md) · [Reporting policy](./CONTRIBUTING.md)
 
-![Version: 1.5.0](https://img.shields.io/badge/Version-1.5.0-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 1.5.0](https://img.shields.io/badge/AppVersion-1.5.0-informational?style=flat-square)
+![Version: 1.6.0](https://img.shields.io/badge/Version-1.6.0-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square) ![AppVersion: 1.6.0](https://img.shields.io/badge/AppVersion-1.6.0-informational?style=flat-square)
 
 Helm tpl library for gitops repo
 
 This Helm library generates Argo CD Applications for Helm charts and raw-manifest
 directories. The root consumer chart and its `extras/` chart use the same project name;
-each generated Application also includes the configured cluster name.
+each generated Application includes the cluster name only when configured.
 
 ## Quick start
 
@@ -22,7 +22,7 @@ version: 1.0.0
 appVersion: "1.0.0"
 dependencies:
   - name: argocd-gitops-tpl-library
-    version: 1.5.0
+    version: 1.6.0
     repository: oci://registry-1.docker.io/grootantech
 ```
 
@@ -58,9 +58,9 @@ Resolve links against the same branch, tag or local checkout; do not load all gu
 
 ## Naming at a glance
 
-Generated child names use `<Chart.Name>-<cluster>-<app-path>[-<environment>]`; the
+Generated child names use `<Chart.Name>[-<cluster>]-<app-path>[-<environment>]`; the
 bootstrap root Application is separately named
-`<cluster>-<project>-<environment>-root` (or `<cluster>-<project>-root` without an
+`[<cluster>-]<project>-<environment>-root` (or `[<cluster>-]<project>-root` without an
 environment). Root-level YAML files in `extras/manifests/` are ignored; place each workload
 under its own named directory.
 
