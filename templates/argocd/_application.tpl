@@ -85,6 +85,9 @@ destination:
 {{- $chartName := "" }}
 
 {{- if $chart.path }}
+{{- if hasKey .appName "plugin" }}
+  {{- fail "app.plugin is supported only for Helm-repository charts; chart.path must use native Helm" }}
+{{- end }}
 {{- $releaseName := (.appName).releaseName | default .name | toString }}
 source:
   repoURL: {{ $.Values.repoURL }}
@@ -115,16 +118,24 @@ source:
 {{- else }}
   {{- $valuesFile = $fileWithChartName }}
 {{- end }}
+{{- $releaseName := tpl ((.appName).releaseName | default $chartName | toString) $ }}
 
 source:
   repoURL: {{ tpl ($chart.repoURL | toString) $ }}
   targetRevision: {{ tpl ($chart.version | toString) $ }}
   chart: {{ $chartName }}
+  {{- if hasKey .appName "plugin" }}
+  {{- include "tpl.argocd.application.plugin" (dict
+      "plugin" .appName.plugin
+      "releaseName" $releaseName
+      "valuesText" (.Files.Get $valuesFile)) | nindent 2 }}
+  {{- else }}
   helm:
-    releaseName: {{ tpl ((.appName).releaseName | default $chartName | toString) $ }}
+    releaseName: {{ $releaseName }}
     values: |
       {{- .Files.Get $valuesFile | nindent 6 }}
     ignoreMissingValueFiles: true
+  {{- end }}
 {{- end }}
 
 destination:

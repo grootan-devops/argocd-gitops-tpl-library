@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-10-07
+
+### Added
+
+- Optional `apps.<entry>.plugin.name` and `plugin.kustomize` for Helm-repository Applications, including grouped and nested entries. The CMP replaces native `source.helm` while retaining chart identity, values-file lookup, destination and sync settings.
+- Inline Kustomize patches, images, labels, common annotations and replicas. The library supplies `resources: [all.yaml]` and rejects unsupported source types and file-based patches.
+- A three-variable CMP contract: `HELM_RELEASE_NAME`, `HELM_VALUES` and `KUSTOMIZATION_YAML`, with literal-dollar escaping for Argo CD environment interpolation.
+- Plugin contract tests and an opt-in migration guide. Existing native Helm Applications, extras manifest handling and disabled states remain unchanged.
+
 ## [1.4.0] - 2026-10-01
 
 ### Added

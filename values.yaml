@@ -67,6 +67,20 @@ apps:
       repoURL: chart.cr.io/helm
       version: 0.1.0
       name: test
+    # Optional: select a CMP registered in Argo CD; omit to use native Helm.
+    # plugin:
+    #   name: kustomized-helm
+    #   kustomize:
+    #     patches:
+    #       - target:
+    #           group: apps
+    #           version: v1
+    #           kind: Deployment
+    #           name: test
+    #         patch: |-
+    #           - op: add
+    #             path: /spec/revisionHistoryLimit
+    #             value: 0
     sync:
       automated:
         prune: true

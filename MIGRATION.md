@@ -7,6 +7,13 @@ To upgrade, apply every section after your pinned version up to the target, olde
 Newer sections are split into **Required** (the upgrade breaks or misbehaves without it),
 **Recommended** (aligns an existing environment with the current standards) and **Verify**.
 
+## 1.5.0
+
+### Required
+
+No migration is required for existing native Helm Applications. Update the library
+pin in both consumer `Chart.yaml` files to `1.5.0` and rebuild their dependencies.
+
 ## 1.4.0
 
 ### Required
