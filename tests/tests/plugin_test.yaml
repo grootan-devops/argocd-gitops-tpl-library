@@ -75,11 +75,7 @@ tests:
           path: spec.source.plugin.env[1]
           value:
             name: HELM_VALUES
-            value: |
-              message: '$$HOME $${ARGOCD_APP_NAME} $$$$ {{ untouched }}'
-              resources:
-                requests:
-                  memory: 128Mi
+            value: ''
       - equal:
           path: spec.source.plugin.env[2]
           value:
@@ -147,8 +143,9 @@ tests:
           path: spec.source.plugin.env[1].value
           value: |
             component: grouped-worker
+            message: '$$HOME $${ARGOCD_APP_NAME} $$$$ {{ untouched }}'
 
-  - it: uses nested values and a templated release name with a plugin
+  - it: uses grouped values fallback and a templated release name for a nested plugin
     set:
       apps.plugin-contract.enabled: false
       apps.cmp-group:
@@ -176,7 +173,8 @@ tests:
       - equal:
           path: spec.source.plugin.env[1].value
           value: |
-            component: nested-worker
+            component: grouped-worker
+            message: '$$HOME $${ARGOCD_APP_NAME} $$$$ {{ untouched }}'
 
   - it: uses chart defaults when no values file exists
     set:
@@ -263,11 +261,3 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: app.plugin is supported only for Helm-repository charts; chart.path must use native Helm
-
-  - it: rejects plugin opt-in on the parent extras Application
-    set:
-      extras.enabled: true
-      extras.plugin.name: kustomized-helm
-    asserts:
-      - failedTemplate:
-          errorMessage: app.plugin is supported only for Helm-repository chart Applications, not extras

@@ -1,4 +1,0 @@
-message: '$HOME ${ARGOCD_APP_NAME} $$ {{ untouched }}'
-resources:
-  requests:
-    memory: 128Mi

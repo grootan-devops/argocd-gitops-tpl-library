@@ -1,1 +1,2 @@
 component: grouped-worker
+message: '$HOME ${ARGOCD_APP_NAME} $$ {{ untouched }}'

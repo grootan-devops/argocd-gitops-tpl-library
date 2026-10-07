@@ -91,8 +91,9 @@ stdout. It must contain compatible Helm and Kustomize binaries. Dependency build
 needs its own access to any unpackaged chart dependencies.
 
 This initial contract supports Helm-repository chart sources. Git charts using
-`chart.path`, the parent Extras Application and raw-manifest extras reject plugin
-opt-in. Patch files from the GitOps repository are unavailable in the downloaded
+`chart.path` reject plugin opt-in. Extras retain their existing manifest flow;
+edit their raw manifests directly. No plugin handling is added to extras.
+Patch files from the GitOps repository are unavailable in the downloaded
 chart workspace, so file-based patches and additional resource files are unsupported.
 Patches modify existing objects; missing PDBs, policies and monitors still need their
 own resource definitions or chart options.

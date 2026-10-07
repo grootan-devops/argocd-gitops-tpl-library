@@ -30,9 +30,6 @@ metadata:
 spec:
   project: {{ .Values.project }}
   {{- if (.extras) }}
-  {{- if hasKey .appName "plugin" }}
-    {{- fail "app.plugin is supported only for Helm-repository chart Applications, not extras" }}
-  {{- end }}
   {{- include "tpl.argocd.application.extras.app" $ | indent 2 }}
   {{- else }}
   {{- include "tpl.argocd.application.helm.app" $ | indent 2 }}
@@ -183,9 +180,6 @@ destination:
       {{- end }}
 
       {{- if and $isEnabled $extrasEnabled }}
-{{- if hasKey $extraValues "plugin" }}
-  {{- fail "app.plugin is supported only for Helm-repository chart Applications, not raw-manifest extras" }}
-{{- end }}
 {{- $extrasSync := $extrasConfig.sync | default dict }}
 {{- $extraSync := $extraValues.sync | default dict }}
 {{- $globalSync := $.Values.sync | default dict }}

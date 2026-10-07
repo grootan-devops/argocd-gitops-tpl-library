@@ -2,21 +2,6 @@ suite: Argo CD Extras contract
 templates:
   - templates/extras.yaml
 tests:
-  - it: rejects plugin opt-in for raw-manifest extras
-    set:
-      apps.clamav.plugin.name: kustomized-helm
-    asserts:
-      - failedTemplate:
-          errorMessage: app.plugin is supported only for Helm-repository chart Applications, not raw-manifest extras
-
-  - it: preserves a disabled extra with an unsupported plugin definition
-    set:
-      apps.clamav.enabled: false
-      apps.clamav.plugin.name: kustomized-helm
-    asserts:
-      - hasDocuments:
-          count: 0
-
   - it: renders an app with the configured cluster and environment
     asserts:
       - hasDocuments:

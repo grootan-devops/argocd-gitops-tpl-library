@@ -20,8 +20,9 @@ For Applications opting into the plugin:
    must consume the three variables in [the plugin guide](./docs/helm-kustomize.md).
 2. Set `plugin.name` to that registration's effective name; a CMP with `spec.version`
    includes that version in the selected name. The library does not install the CMP.
-3. Use a Helm repository chart and inline Kustomize options. `chart.path` and raw
-   extras are unsupported for this contract and fail rendering when opted in.
+3. Use a Helm repository chart and inline Kustomize options. `chart.path` fails
+   rendering when opted in. Extras retain their existing manifest flow and have
+   no plugin handling; edit their raw manifests directly.
 
 ### Recommended
 
