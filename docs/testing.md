@@ -10,7 +10,7 @@ discovery, ignored root-level YAML, environment omission, branch/namespace defau
 `extras.enabled` and sync defaults, folder overrides, and retry/options precedence.
 
 The plugin suite covers the native/plugin generator choice, the three-variable environment
-contract, literal-dollar escaping, grouped values lookup and nested fallback, disabled
+contract, literal-dollar escaping, values-file fallback for grouped and nested apps, disabled
 definitions and rejection of unsupported plugin sources and patch files. Render a pinned
 service chart through the actual CMP separately before rollout; these unit tests generate
 Applications and do not contact a running Argo CD installation.

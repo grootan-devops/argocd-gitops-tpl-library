@@ -117,7 +117,7 @@ tests:
       - hasDocuments:
           count: 0
 
-  - it: uses grouped values and namespace with a plugin
+  - it: uses chart-name values fallback and group namespace with a plugin
     set:
       apps.plugin-contract.enabled: false
       apps.cmp-group:
@@ -125,7 +125,7 @@ tests:
         worker:
           chart:
             repoURL: https://charts.example.com
-            name: plugin-contract
+            name: defaults
             version: 2.3.4
           plugin:
             name: kustomized-helm
@@ -138,14 +138,19 @@ tests:
           value: group-space
       - equal:
           path: spec.source.plugin.env[0].value
-          value: plugin-contract
+          value: defaults
       - equal:
           path: spec.source.plugin.env[1].value
           value: |
-            component: grouped-worker
-            message: '$$HOME $${ARGOCD_APP_NAME} $$$$ {{ untouched }}'
+            branch: ""
+            namespace: ""
+            apps:
+              api:
+                namespace: ""
+                chart:
+                  path: charts/payment-api
 
-  - it: uses grouped values fallback and a templated release name for a nested plugin
+  - it: uses chart-name values fallback and a templated release name for a nested plugin
     set:
       apps.plugin-contract.enabled: false
       apps.cmp-group:
@@ -156,7 +161,7 @@ tests:
             releaseName: '{{ .Values.cluster }}-worker'
             chart:
               repoURL: https://charts.example.com
-              name: plugin-contract
+              name: defaults
               version: 2.3.4
             plugin:
               name: kustomized-helm
@@ -173,8 +178,13 @@ tests:
       - equal:
           path: spec.source.plugin.env[1].value
           value: |
-            component: grouped-worker
-            message: '$$HOME $${ARGOCD_APP_NAME} $$$$ {{ untouched }}'
+            branch: ""
+            namespace: ""
+            apps:
+              api:
+                namespace: ""
+                chart:
+                  path: charts/payment-api
 
   - it: uses chart defaults when no values file exists
     set:
