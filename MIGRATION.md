@@ -11,11 +11,8 @@ Newer sections are split into **Required** (the upgrade breaks or misbehaves wit
 
 ### Required
 
-Update the library pin in both consumer `Chart.yaml` files to `1.6.0` and rebuild
-their dependencies. Keep the existing `cluster` value to preserve Application names.
-Omitting or emptying it changes those names; review the resulting renames and
-resource-finalizer behavior before syncing. The destination cluster is still
-selected separately through `server`.
+No migration is required for existing Applications. Update the library pin in both
+consumer `Chart.yaml` files to `1.6.0` and rebuild their dependencies.
 
 ## 1.5.0
 
