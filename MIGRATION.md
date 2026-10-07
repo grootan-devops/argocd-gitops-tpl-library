@@ -7,6 +7,42 @@ To upgrade, apply every section after your pinned version up to the target, olde
 Newer sections are split into **Required** (the upgrade breaks or misbehaves without it),
 **Recommended** (aligns an existing environment with the current standards) and **Verify**.
 
+## 1.5.0
+
+### Required
+
+No migration is required for existing native Helm Applications. Update the library
+pin in both consumer `Chart.yaml` files to `1.5.0` and rebuild their dependencies.
+
+For Applications opting into the plugin:
+
+1. Register a Helm–Kustomize CMP on Argo CD before setting `plugin.name`. Its script
+   must consume the three variables in [the plugin guide](./docs/helm-kustomize.md).
+2. Set `plugin.name` to that registration's effective name; a CMP with `spec.version`
+   includes that version in the selected name. The library does not install the CMP.
+3. Use a Helm repository chart and inline Kustomize options. `chart.path` and raw
+   extras are unsupported for this contract and fail rendering when opted in.
+
+### Recommended
+
+- Migrate one Application first, preserving its release name, chart version and
+  destination. Leave disabled definitions disabled.
+- Keep patches scoped to specific workloads. Check selectors, PVC templates,
+  resource identities and application configuration before syncing.
+- Use `labels.includeSelectors: false` for informational labels. Keep diff exceptions
+  narrowly scoped to justified controller-owned fields.
+
+### Verify
+
+- Without `plugin`, generated `source.helm` and all existing Application fields match
+  the previous release. With `plugin`, only `source.plugin` selects the generator.
+- The generated environment contains exactly `HELM_RELEASE_NAME`, `HELM_VALUES` and
+  `KUSTOMIZATION_YAML`; the script reads their `ARGOCD_ENV_` equivalents.
+- Render the actual pinned chart through Helm and Kustomize, including hooks and
+  tests, and verify the intended patch targets and workload standards.
+- Verify chart downloading, dependency credentials and plugin invocation in your
+  Argo CD version before rollout. This repository's local tests do not contact a cluster.
+
 ## 1.4.0
 
 ### Required

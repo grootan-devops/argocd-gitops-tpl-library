@@ -1,0 +1,28 @@
+extras:
+  enabled: false
+apps:
+  api:
+    enabled: false
+  admin:
+    enabled: false
+  plugin-contract:
+    enabled: true
+    namespace: plugin-space
+    releaseName: plugin-release
+    chart:
+      repoURL: https://charts.example.com
+      name: plugin-contract
+      version: 2.3.4
+    ignoreDifferences:
+      - group: apps
+        kind: Deployment
+        jsonPointers:
+          - /spec/replicas
+    sync:
+      automated:
+        prune: false
+        selfHeal: true
+      options:
+        - CreateNamespace=false
+      retry:
+        limit: 2

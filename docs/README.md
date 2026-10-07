@@ -8,6 +8,7 @@ This is the task-based documentation index for `argocd-gitops-tpl-library`. The 
 | Create the consumer chart layout, dependencies and starter files | [Getting started](./getting-started.md) |
 | Configure root/extras values and generated Application fields | [Configuration](./configuration.md) |
 | Add a service to an environment and write its values file | [Helm Applications](./configuration.md#helm-applications-apps) |
+| Apply inline Kustomize overrides to a Helm chart through a CMP | [Helm–Kustomize plugin](./helm-kustomize.md) |
 | Add raw Kubernetes manifests | [Extras manifests](./extras.md) |
 | Bootstrap the top-level Argo CD Application | [Root Application](./root-application.md) |
 | Verify rendering and Helm unit tests | [Testing](./testing.md) |

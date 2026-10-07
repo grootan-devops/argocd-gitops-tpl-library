@@ -26,7 +26,7 @@ version: 1.0.0
 appVersion: "1.0.0"
 dependencies:
   - name: argocd-gitops-tpl-library
-    version: 1.4.0
+    version: 1.5.0
     repository: oci://registry-1.docker.io/grootantech
 ```
 
@@ -51,6 +51,7 @@ need:
 | Bootstrap a root and extras consumer chart from the starter files | [Getting started](./docs/getting-started.md) |
 | Configure app names, namespaces, branches, and sync policy | [Configuration](./docs/configuration.md) |
 | Add a service to an environment and write its values file | [Helm Applications](./docs/configuration.md#helm-applications-apps) |
+| Apply inline Kustomize overrides to a Helm chart through a CMP | [Helm–Kustomize plugin](./docs/helm-kustomize.md) |
 | Add raw manifests and understand Extras Applications | [Extras manifests](./docs/extras.md) |
 | Create the Argo CD root Application | [Root Application](./docs/root-application.md) |
 | Run chart and unit-test verification | [Testing](./docs/testing.md) |

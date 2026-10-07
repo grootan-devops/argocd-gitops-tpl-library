@@ -128,6 +128,13 @@ apps:
   that updates the entry by its path (`.apps.orders`). Removing an entry deletes its
   Application and, with pruning, its workloads.
 
+### Optional Helm–Kustomize plugin
+
+Set `apps.<entry>.plugin.name` to select a registered CMP instead of native Helm, and
+`plugin.kustomize` for inline transformations. Omit `plugin` to retain native Helm.
+See [the plugin guide](./helm-kustomize.md) for the schema, environment contract and
+supported source types.
+
 ### What a values file overrides
 
 The chart's `values.yaml` holds the service's behaviour; an environment's values file holds

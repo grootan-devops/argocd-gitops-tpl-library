@@ -1,0 +1,273 @@
+suite: Optional Helm Kustomize plugin
+templates:
+  - templates/apps.yaml
+values:
+  - fixtures/plugin.yaml
+tests:
+  - it: retains native Helm when plugin is absent
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.source.helm.releaseName
+          value: plugin-release
+      - equal:
+          path: spec.source.helm.ignoreMissingValueFiles
+          value: true
+      - notExists:
+          path: spec.source.plugin
+
+  - it: selects one configurable plugin and preserves the Application contract
+    set:
+      apps.plugin-contract.plugin.name: helm-kustomize-v2
+    asserts:
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-plugin-contract-dev
+      - equal:
+          path: spec.source.repoURL
+          value: https://charts.example.com
+      - equal:
+          path: spec.source.chart
+          value: plugin-contract
+      - equal:
+          path: spec.source.targetRevision
+          value: 2.3.4
+      - equal:
+          path: spec.source.plugin.name
+          value: helm-kustomize-v2
+      - notExists:
+          path: spec.source.helm
+      - notExists:
+          path: spec.source.kustomize
+      - equal:
+          path: spec.destination
+          value:
+            name: in-cluster
+            namespace: plugin-space
+      - equal:
+          path: spec.syncPolicy.automated
+          value:
+            prune: false
+            selfHeal: true
+      - contains:
+          path: spec.syncPolicy.syncOptions
+          content: CreateNamespace=false
+      - equal:
+          path: spec.syncPolicy.retry.limit
+          value: 2
+      - equal:
+          path: spec.ignoreDifferences
+          value:
+            - group: apps
+              kind: Deployment
+              jsonPointers:
+                - /spec/replicas
+      - equal:
+          path: spec.revisionHistoryLimit
+          value: 3
+      - equal:
+          path: spec.source.plugin.env[0]
+          value:
+            name: HELM_RELEASE_NAME
+            value: plugin-release
+      - equal:
+          path: spec.source.plugin.env[1]
+          value:
+            name: HELM_VALUES
+            value: |
+              message: '$$HOME $${ARGOCD_APP_NAME} $$$$ {{ untouched }}'
+              resources:
+                requests:
+                  memory: 128Mi
+      - equal:
+          path: spec.source.plugin.env[2]
+          value:
+            name: KUSTOMIZATION_YAML
+            value: |-
+              apiVersion: kustomize.config.k8s.io/v1beta1
+              kind: Kustomization
+              resources:
+              - all.yaml
+      - notExists:
+          path: spec.source.plugin.env[3]
+
+  - it: serializes an inline patch literally and escapes dollars
+    set:
+      apps.plugin-contract.plugin:
+        name: kustomized-helm
+        kustomize:
+          patches:
+            - target:
+                kind: Deployment
+                name: plugin-contract
+              patch: |-
+                - op: add
+                  path: /metadata/annotations/example
+                  value: '$HOME {{ untouched }}'
+    asserts:
+      - matchRegex:
+          path: spec.source.plugin.env[2].value
+          pattern: '\$\$HOME \{\{ untouched \}\}'
+      - matchRegex:
+          path: spec.source.plugin.env[2].value
+          pattern: 'resources:\n- all.yaml'
+
+  - it: preserves disabled plugin definitions without validating or enabling them
+    set:
+      apps.plugin-contract.enabled: false
+      apps.plugin-contract.plugin.name: ''
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: uses grouped values and namespace with a plugin
+    set:
+      apps.plugin-contract.enabled: false
+      apps.cmp-group:
+        namespace: group-space
+        worker:
+          chart:
+            repoURL: https://charts.example.com
+            name: plugin-contract
+            version: 2.3.4
+          plugin:
+            name: kustomized-helm
+    asserts:
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-cmp-group-worker-dev
+      - equal:
+          path: spec.destination.namespace
+          value: group-space
+      - equal:
+          path: spec.source.plugin.env[0].value
+          value: plugin-contract
+      - equal:
+          path: spec.source.plugin.env[1].value
+          value: |
+            component: grouped-worker
+
+  - it: uses nested values and a templated release name with a plugin
+    set:
+      apps.plugin-contract.enabled: false
+      apps.cmp-group:
+        namespace: group-space
+        backend:
+          namespace: backend-space
+          worker:
+            releaseName: '{{ .Values.cluster }}-worker'
+            chart:
+              repoURL: https://charts.example.com
+              name: plugin-contract
+              version: 2.3.4
+            plugin:
+              name: kustomized-helm
+    asserts:
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-cmp-group-backend-worker-dev
+      - equal:
+          path: spec.destination.namespace
+          value: backend-space
+      - equal:
+          path: spec.source.plugin.env[0].value
+          value: midgard-worker
+      - equal:
+          path: spec.source.plugin.env[1].value
+          value: |
+            component: nested-worker
+
+  - it: uses chart defaults when no values file exists
+    set:
+      apps.plugin-contract.enabled: false
+      apps.no-values:
+        chart:
+          repoURL: https://charts.example.com
+          name: no-values
+          version: 2.3.4
+        plugin:
+          name: kustomized-helm
+    asserts:
+      - equal:
+          path: spec.source.plugin.env[1].value
+          value: ''
+
+  - it: keeps a disabled group disabled with plugin entries
+    set:
+      apps.plugin-contract.enabled: false
+      apps.cmp-group:
+        enabled: false
+        worker:
+          chart:
+            repoURL: https://charts.example.com
+            name: plugin-contract
+            version: 2.3.4
+          plugin:
+            name: kustomized-helm
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: rejects an empty plugin block
+    set:
+      apps.plugin-contract.plugin: {}
+    asserts:
+      - failedTemplate:
+          errorMessage: app.plugin.name must be a non-empty string
+
+  - it: rejects a plugin list
+    set:
+      apps.plugin-contract.plugin:
+        - name: kustomized-helm
+    asserts:
+      - failedTemplate:
+          errorMessage: app.plugin must be an object with a non-empty name
+
+  - it: rejects unsupported plugin environment configuration
+    set:
+      apps.plugin-contract.plugin:
+        name: kustomized-helm
+        env: []
+    asserts:
+      - failedTemplate:
+          errorMessage: app.plugin.env is unsupported; use name and kustomize
+
+  - it: rejects resources that would replace Helm output
+    set:
+      apps.plugin-contract.plugin:
+        name: kustomized-helm
+        kustomize:
+          resources: []
+    asserts:
+      - failedTemplate:
+          errorMessage: app.plugin.kustomize.resources is unsupported; use inline patches, images, labels, commonAnnotations or replicas
+
+  - it: rejects file-based patches from another repository
+    set:
+      apps.plugin-contract.plugin:
+        name: kustomized-helm
+        kustomize:
+          patches:
+            - path: patch.yaml
+              target:
+                kind: Deployment
+    asserts:
+      - failedTemplate:
+          errorMessage: app.plugin.kustomize.patches must be inline; patch files are unavailable in downloaded charts
+
+  - it: rejects Git chart plugin opt-in rather than ignoring it
+    set:
+      apps.plugin-contract.chart.path: charts/service
+      apps.plugin-contract.plugin.name: kustomized-helm
+    asserts:
+      - failedTemplate:
+          errorMessage: app.plugin is supported only for Helm-repository charts; chart.path must use native Helm
+
+  - it: rejects plugin opt-in on the parent extras Application
+    set:
+      extras.enabled: true
+      extras.plugin.name: kustomized-helm
+    asserts:
+      - failedTemplate:
+          errorMessage: app.plugin is supported only for Helm-repository chart Applications, not extras
