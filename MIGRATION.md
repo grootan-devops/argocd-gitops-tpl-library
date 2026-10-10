@@ -7,6 +7,20 @@ To upgrade, apply every section after your pinned version up to the target, olde
 Newer sections are split into **Required** (the upgrade breaks or misbehaves without it),
 **Recommended** (aligns an existing environment with the current standards) and **Verify**.
 
+## 1.7.0
+
+### Required
+
+Update both consumer library pins to `1.7.0` and rebuild dependencies. Before using
+`plugin.skipCrds`, update the registered CMP script to consume
+`ARGOCD_ENV_HELM_SKIP_CRDS` as shown in the plugin guide. The library configures the
+Application environment; it does not install or update the CMP script.
+
+### Verify
+
+Omitted or `false` includes CRDs; `true` excludes them. Review rendered CRDs before
+syncing, especially when another Application owns them. Native Helm sources remain unchanged.
+
 ## 1.6.0
 
 ### Required

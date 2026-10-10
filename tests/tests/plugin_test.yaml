@@ -102,8 +102,11 @@ tests:
               kind: Kustomization
               resources:
               - all.yaml
-      - notExists:
+      - equal:
           path: spec.source.plugin.env[3]
+          value:
+            name: HELM_SKIP_CRDS
+            value: "false"
 
   - it: serializes an inline patch literally and escapes dollars
     set:
@@ -256,7 +259,7 @@ tests:
         env: []
     asserts:
       - failedTemplate:
-          errorMessage: app.plugin.env is unsupported; use name and kustomize
+          errorMessage: app.plugin.env is unsupported; use name, kustomize and skipCrds
 
   - it: rejects resources that would replace Helm output
     set:
@@ -288,3 +291,29 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: app.plugin is supported only for Helm-repository charts; chart.path must use native Helm
+
+  - it: skips CRDs when explicitly enabled
+    set:
+      apps.plugin-contract.plugin.name: kustomized-helm
+      apps.plugin-contract.plugin.skipCrds: true
+    asserts:
+      - equal:
+          path: spec.source.plugin.env[3].value
+          value: "true"
+
+  - it: includes CRDs when explicitly false
+    set:
+      apps.plugin-contract.plugin.name: kustomized-helm
+      apps.plugin-contract.plugin.skipCrds: false
+    asserts:
+      - equal:
+          path: spec.source.plugin.env[3].value
+          value: "false"
+
+  - it: rejects string CRD flags
+    set:
+      apps.plugin-contract.plugin.name: kustomized-helm
+      apps.plugin-contract.plugin.skipCrds: "true"
+    asserts:
+      - failedTemplate:
+          errorMessage: app.plugin.skipCrds must be a boolean

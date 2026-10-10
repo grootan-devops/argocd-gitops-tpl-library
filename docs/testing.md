@@ -9,8 +9,8 @@ when direct extras-manifest rendering is enabled. The extras chart suite covers 
 discovery, ignored root-level YAML, environment omission, branch/namespace defaults, global
 `extras.enabled` and sync defaults, folder overrides, and retry/options precedence.
 
-The plugin suite covers the native/plugin generator choice, the three-variable environment
-contract, literal-dollar escaping, values-file fallback for grouped and nested apps, disabled
+The plugin suite covers the native/plugin generator choice, the four-variable environment
+contract, CRD include/skip defaults and boolean validation, literal-dollar escaping, values-file fallback for grouped and nested apps, disabled
 definitions and rejection of unsupported plugin sources and patch files. Render a pinned
 service chart through the actual CMP separately before rollout; these unit tests generate
 Applications and do not contact a running Argo CD installation.

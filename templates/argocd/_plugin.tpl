@@ -5,14 +5,19 @@
   {{- fail "app.plugin must be an object with a non-empty name" -}}
 {{- end -}}
 {{- range $key, $_ := $plugin -}}
-  {{- if not (has $key (list "name" "kustomize")) -}}
-    {{- fail (printf "app.plugin.%s is unsupported; use name and kustomize" $key) -}}
+  {{- if not (has $key (list "name" "kustomize" "skipCrds")) -}}
+    {{- fail (printf "app.plugin.%s is unsupported; use name, kustomize and skipCrds" $key) -}}
   {{- end -}}
 {{- end -}}
 {{- if not (kindIs "string" $plugin.name) -}}
   {{- fail "app.plugin.name must be a non-empty string" -}}
 {{- end -}}
 {{- $name := required "app.plugin.name must be a non-empty string" (trim $plugin.name) -}}
+{{- if hasKey $plugin "skipCrds" -}}
+  {{- if not (kindIs "bool" $plugin.skipCrds) -}}
+    {{- fail "app.plugin.skipCrds must be a boolean" -}}
+  {{- end -}}
+{{- end -}}
 {{- $kustomize := dict -}}
 {{- if hasKey $plugin "kustomize" -}}
   {{- if not (kindIs "map" $plugin.kustomize) -}}
@@ -57,4 +62,6 @@ plugin:
       value: {{ .valuesText | replace "$" "$$" | quote }}
     - name: KUSTOMIZATION_YAML
       value: {{ toYaml $kustomize | replace "$" "$$" | quote }}
+    - name: HELM_SKIP_CRDS
+      value: {{ get $plugin "skipCrds" | default false | toString | quote }}
 {{- end -}}
