@@ -134,7 +134,8 @@ apps:
 ### Optional Helm–Kustomize plugin
 
 Set `apps.<entry>.plugin.name` to select a registered CMP instead of native Helm, and
-`plugin.kustomize` for inline transformations. Omit `plugin` to retain native Helm.
+`plugin.kustomize` for inline transformations. Set `plugin.skipCrds: true` to exclude
+CRDs through a compatible CMP script; the default is `false`. Omit `plugin` to retain native Helm.
 See [the plugin guide](./helm-kustomize.md) for the schema, environment contract and
 supported source types.
 
