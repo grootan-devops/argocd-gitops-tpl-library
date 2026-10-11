@@ -18,6 +18,7 @@ apps:
       version: 16.2.2
     plugin:
       name: kustomized-helm
+      skipCrds: false # include CRDs; true excludes them
       kustomize:
         patches:
           - target:
@@ -60,12 +61,13 @@ after rendering; success alone does not establish compliance.
 ## Generated source and environment
 
 The library retains `repoURL`, chart name and pinned chart version. It emits
-`source.plugin` instead of `source.helm`, with exactly these environment variables:
+`source.plugin` instead of `source.helm`, with these environment variables:
 
 | Variable | Content |
 | --- | --- |
 | `HELM_RELEASE_NAME` | The existing resolved release name, defaulting to chart name. |
 | `HELM_VALUES` | The existing values-file selection, including grouped/nested lookup and chart-name fallback. |
+| `HELM_SKIP_CRDS` | `"false"` by default; `"true"` when `plugin.skipCrds: true`. |
 | `KUSTOMIZATION_YAML` | A complete Kustomization referring to Helm's `all.yaml` output. |
 
 The existing missing-values-file behavior remains: empty values use chart defaults.
@@ -76,6 +78,20 @@ Argo CD exposes these as `ARGOCD_ENV_HELM_RELEASE_NAME`, `ARGOCD_ENV_HELM_VALUES
 The library escapes literal dollar signs in values and Kustomize content as `$$`
 for Argo CD interpolation. The CMP must write the resulting strings literally.
 Inline patch content is not evaluated with Helm `tpl`.
+
+`plugin.skipCrds` accepts only a YAML boolean. It defaults to `false`, including
+CRDs. Argo CD exposes the custom variable as `ARGOCD_ENV_HELM_SKIP_CRDS`; this is
+not a native Helm environment variable. Before `helm template`, the CMP must add:
+
+```bash
+if [[ ${ARGOCD_ENV_HELM_SKIP_CRDS:-false} == false ]]; then
+  args+=(--include-crds)
+fi
+```
+
+Pass `"${args[@]}"` to `helm template`. Remove any unconditional `--include-crds`
+flag so `skipCrds: true` takes effect. This controls Helm's `crds/` output; CRDs
+rendered from `templates/` still require the chart's own settings.
 
 ## CMP prerequisites and source limitations
 

@@ -70,6 +70,7 @@ apps:
     # Optional: select a CMP registered in Argo CD; omit to use native Helm.
     # plugin:
     #   name: kustomized-helm
+    #   skipCrds: false # Optional; omit or false includes CRDs, true skips them.
     #   kustomize:
     #     patches:
     #       - target:
