@@ -15,6 +15,7 @@ this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- CI calls the github-ci-library 1.7.0 reusable workflows instead of 1.5.0.
 - The README is the one documentation index; `docs/README.md` points to it. The README drops its link to the ai-skills compatibility page and its version badge, and its AI reading notes are a section that says which release to read.
 - The Helm requirement is `>=3.8.0`, the first release that resolves `oci://` dependencies.
 - Example dependency pins are `<version>`, and the getting-started guide pins the latest release tag instead of the highest version in the registry, which can be a candidate.
