@@ -34,7 +34,7 @@ version: 1.0.0
 appVersion: "1.0.0"
 dependencies:
   - name: argocd-gitops-tpl-library
-    version: 1.7.0 # replace with the latest stable published release
+    version: <version> # the latest release tag, the same in both charts
     repository: oci://registry-1.docker.io/grootantech
 ```
 
@@ -63,7 +63,8 @@ through generated Applications.
 Fill the `<…>` values from the repository README and the user's answers. The root
 `values.yaml` is the example in [Configuration](./configuration.md#root-chart-values), with
 `apps: {}`; the root Application is the manifest in [Root Application](./root-application.md).
-Pin `<version>` to the highest stable release published to the OCI registry.
+Pin `<version>` to the latest release tag, the newest GitHub release, in both charts. The
+registry can also hold pull request candidates (`<version>-<run>.<pr>`); never pin one.
 
 `.gitignore`:
 
