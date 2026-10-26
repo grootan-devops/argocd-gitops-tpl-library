@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-10-27
+
+### Added
+
+- `docs/environment-map.json`: how an environment adds a service (the values file path, the sync presets, the release-shape keys) and what an environment values file may override, for tools to read at the version an environment pins. It ships inside the packaged chart.
+- `docs/maintainer-guide.md`: the release steps, pull request checks, versioning and deprecation policy, the documentation commands and how to keep the environment map in step with the docs.
+- `kubeVersion: ">=1.27.0-0"` in `Chart.yaml`, so the requirements line is generated.
+
+### Changed
+
+- CI calls the github-ci-library 1.7.0 reusable workflows instead of 1.5.0.
+- The README is the one documentation index; `docs/README.md` points to it. The README drops its link to the ai-skills compatibility page and its version badge, and its AI reading notes are a section that says which release to read.
+- The Helm requirement is `>=3.8.0`, the first release that resolves `oci://` dependencies.
+- Example dependency pins are `<version>`, and the getting-started guide pins the latest release tag instead of the highest version in the registry, which can be a candidate.
+- Pull request verification publishes its candidate as `<version>-<run>.<pr>`. It published the bare release version to the release repository, where a consumer could pin it before the release.
+
+### Fixed
+
+- `values.yaml`: the example entries' comments give their real entry paths, rendered names and namespaces; `automated: {}` keeps automated sync on rather than disabling it; a path chart reads its values from its own directory.
+- `MIGRATION.md`: the `1.2.0` raw-manifest path is `extras/manifests/<app>/`, and `1.6.0` notes that `cluster` became optional again.
+
 ## [1.8.0] - 2026-10-23
 
 ### Changed
