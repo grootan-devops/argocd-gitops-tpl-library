@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-11-24
+
+### Added
+
+- Optional `argocdServer` to pick the extras app-of-apps' destination cluster, so
+  an environment can target a workload cluster other than `in-cluster` without
+  sending the extras app-of-apps' own child Application objects there too.
+
+### Fixed
+
+- The extras app-of-apps' destination now falls back to `in-cluster` when neither
+  `argocdServer` nor `server` is set, instead of erroring. It renders child
+  Application objects, which only ever belong on the Argo CD control-plane
+  cluster, never on the environment's workload cluster. Consumers that set
+  `server` to a non-`in-cluster` value for their workload apps and want the
+  extras app-of-apps to keep targeting `in-cluster` must now set
+  `argocdServer: in-cluster` explicitly; existing consumers who set neither are
+  unaffected.
+
 ## [1.9.0] - 2026-10-27
 
 ### Added
