@@ -72,7 +72,7 @@ destination:
     existing .Values.server (preserved for backward compatibility with consumers
     already relying on it here), else "in-cluster" as the last-resort default.
   */}}
-  name: {{ .Values.argocdServer | default .Values.server | default "in-cluster" }}
+  name: {{ default "in-cluster" (default .Values.server .Values.argocdServer) }}
   namespace: argo-cd
 {{- end }}
 
