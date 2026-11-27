@@ -65,7 +65,8 @@ source:
   targetRevision: {{ include "tpl.argocd.targetRevision" $ }}
   path: extras
 destination:
-  name: {{ $.Values.server }}
+  {{- /* Renders only child Applications, so it must always target the Argo CD cluster. */}}
+  name: in-cluster
   namespace: argo-cd
 {{- end }}
 
