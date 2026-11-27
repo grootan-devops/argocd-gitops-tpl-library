@@ -7,24 +7,6 @@ To upgrade, apply every section after your pinned version up to the target, olde
 Newer sections are split into **Required** (the upgrade breaks or misbehaves without it),
 **Recommended** (aligns an existing environment with the current standards) and **Verify**.
 
-## 1.10.0
-
-### Required
-
-No migration required for a consumer whose root `values.yaml` sets `server` to
-`in-cluster`. For a consumer whose `server` is a different workload cluster: the
-extras app-of-apps' destination now resolves through `argocdServer`, then
-`server`, then `in-cluster`, in that order, so today's rendered extras
-app-of-apps destination is unchanged unless `argocdServer` is set. Set
-`argocdServer: in-cluster` once the Argo CD control plane and the workload
-cluster genuinely differ, so the extras app-of-apps keeps creating its child
-Applications where Argo CD can reconcile them.
-
-### Verify
-
-- `helm template` renders the same `destination.name` for the extras
-  app-of-apps Application as before the upgrade, unless `argocdServer` is set.
-
 ## 1.9.0
 
 ### Required
