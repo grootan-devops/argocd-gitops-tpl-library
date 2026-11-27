@@ -68,11 +68,12 @@ destination:
   {{- /*
     The extras app-of-apps renders child Application objects, not workloads, so it
     must always target the Argo CD control-plane cluster, never the environment's
-    workload cluster. Precedence: an explicit argocdServer override, else the
-    existing .Values.server (preserved for backward compatibility with consumers
-    already relying on it here), else "in-cluster" as the last-resort default.
+    workload cluster. This is intentionally hardcoded: .Values.server (and the
+    now-removed .Values.argocdServer override) describe the workload cluster for
+    every other Application this chart generates, and must never influence where
+    this control-plane-only object is placed.
   */}}
-  name: {{ default "in-cluster" (default .Values.server .Values.argocdServer) }}
+  name: in-cluster
   namespace: argo-cd
 {{- end }}
 

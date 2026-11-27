@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.1] - 2026-11-27
+
+### Removed
+
+- `argocdServer`, added in 1.10.0. Its fallback let the extras app-of-apps'
+  destination follow `server` when `argocdServer` was unset, which moved it onto
+  the workload cluster for any consumer whose `server` is not `in-cluster`. That
+  is the exact case 1.10.0 claimed was unaffected; it broke sync for the extras
+  app-of-apps, which only ever renders child Application objects and can only
+  run where Argo CD does. Removed rather than deprecated: it shipped in the
+  previous patch-adjacent minor release, it has no consumer relying on the
+  broken fallback, and keeping it would keep the footgun live.
+
+### Fixed
+
+- The extras app-of-apps' destination is hardcoded to `in-cluster`, unconditional
+  on `server` or any other value. See Removed above.
+
 ## [1.10.0] - 2026-11-24
 
 ### Added

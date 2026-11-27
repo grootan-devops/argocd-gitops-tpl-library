@@ -7,6 +7,36 @@ To upgrade, apply every section after your pinned version up to the target, olde
 Newer sections are split into **Required** (the upgrade breaks or misbehaves without it),
 **Recommended** (aligns an existing environment with the current standards) and **Verify**.
 
+## 1.10.1
+
+### Required
+
+`argocdServer` is removed. No migration required for a consumer who never set it,
+or who set `server: in-cluster`: the extras app-of-apps' destination was already
+`in-cluster` and still is.
+
+For a consumer whose root `values.yaml` sets `server` to a workload cluster other
+than `in-cluster`:
+
+- If `argocdServer: in-cluster` was set (the 1.10.0 migration step for this case):
+  no change. The extras app-of-apps' destination was already `in-cluster`, and the
+  value is now ignored rather than read; delete the now-unused line.
+- If `argocdServer` was never set: the extras app-of-apps' destination moves from
+  `server`'s workload cluster back to `in-cluster`. On sync, Argo CD recreates the
+  extras app-of-apps' child Application objects at the new destination; it does
+  not move the workloads those child Applications own, since their own
+  `destination` is unaffected by this change.
+
+### Recommended
+
+- Remove `argocdServer` from `values.yaml` wherever it is still set; it has no
+  effect.
+
+### Verify
+
+- `helm template` renders `destination.name: in-cluster` for the extras
+  app-of-apps Application, regardless of `server` or `argocdServer`.
+
 ## 1.10.0
 
 ### Required

@@ -8,8 +8,6 @@ environment: sample
 # Argo CD Project and registered destination cluster name.
 project: default
 server: in-cluster
-# Cluster where Argo CD runs; leave empty if server is already that cluster.
-argocdServer: ""
 # Git clone URL for Application manifests (excluding extras).
 repoURL: https://gitlab.com/gitops.git
 # Optional source revision. When empty, it defaults to
