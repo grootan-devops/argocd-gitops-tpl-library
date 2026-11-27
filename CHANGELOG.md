@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.1] - 2026-11-27
+
+### Fixed
+
+- The extras app-of-apps' destination is hardcoded to `in-cluster`, instead of
+  following `.Values.server`. It renders only child Application objects, which
+  only ever belong on the Argo CD control-plane cluster; following `server` moved
+  it onto the workload cluster for any consumer whose `server` is not `in-cluster`,
+  breaking sync for the extras app-of-apps and everything beneath it.
+
 ## [1.9.0] - 2026-10-27
 
 ### Added

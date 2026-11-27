@@ -7,6 +7,25 @@ To upgrade, apply every section after your pinned version up to the target, olde
 Newer sections are split into **Required** (the upgrade breaks or misbehaves without it),
 **Recommended** (aligns an existing environment with the current standards) and **Verify**.
 
+## 1.9.1
+
+### Required
+
+No migration required for a consumer whose root `values.yaml` sets `server` to
+`in-cluster`: the extras app-of-apps' destination was already `in-cluster` and
+still is.
+
+For a consumer whose `server` is a different workload cluster: the extras
+app-of-apps' destination moves from `server`'s workload cluster to `in-cluster`.
+On sync, Argo CD recreates the extras app-of-apps' child Application objects at
+the new destination; it does not move the workloads those child Applications
+own, since their own `destination` is unaffected by this change.
+
+### Verify
+
+- `helm template` renders `destination.name: in-cluster` for the extras
+  app-of-apps Application, regardless of `server`.
+
 ## 1.9.0
 
 ### Required

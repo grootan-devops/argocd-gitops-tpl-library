@@ -179,7 +179,7 @@ tests:
         documentIndex: 4
       - equal:
           path: spec.destination.name
-          value: dev-cluster
+          value: in-cluster
         documentIndex: 4
       - equal:
           path: spec.syncPolicy.automated.prune
