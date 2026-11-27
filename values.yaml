@@ -3,8 +3,10 @@ enabled: true
 
 # Optional cluster name segment; leave empty or omit to exclude it from names.
 cluster: ""
-# Optional environment suffix; leave empty to omit it from names.
+# Optional environment segment; leave empty to omit it from names.
 environment: sample
+# Application name layout: legacy (<chart>-<app>-<env>) or prefix (<chart>-<env>-<app>, <chart>-<env>-<folder>-extras).
+naming: legacy
 # Argo CD Project and registered destination cluster name.
 project: default
 server: in-cluster

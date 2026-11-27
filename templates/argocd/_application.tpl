@@ -7,16 +7,26 @@
   {{- $isEnabled = .appName.enabled }}
 {{- end }}
 {{- if $isEnabled }}
+{{- $naming := include "tpl.argocd.naming" . }}
 {{- $nameSegments := list }}
 {{- if .extras }}
   {{- $nameSegments = append $nameSegments "extras" }}
 {{- else }}
-  {{- if and .rootApp (ne .rootApp .Chart.Name) }}
-    {{- $nameSegments = append $nameSegments (include "util.kebabcase" .rootApp) }}
+  {{- $groupSegment := include "util.kebabcase" (.rootApp | default "") }}
+  {{- /* prefix: skip a group the chart name ends with */}}
+  {{- $groupInChart := and (eq $naming "prefix") (hasSuffix (printf "-%s" $groupSegment) .Chart.Name) }}
+  {{- if and .rootApp (ne .rootApp .Chart.Name) (not $groupInChart) }}
+    {{- $nameSegments = append $nameSegments $groupSegment }}
   {{- end }}
   {{- $nameSegments = append $nameSegments (include "util.displayName" .) }}
 {{- end }}
-{{- $appName := include "tpl.argocd.applicationName" (dict "chartName" .Chart.Name "cluster" $cluster "segments" $nameSegments "environment" .Values.environment) }}
+{{- $appName := include "tpl.argocd.applicationName" (dict "chartName" .Chart.Name "cluster" $cluster "segments" $nameSegments "environment" .Values.environment "naming" $naming) }}
+{{- if and (eq $naming "prefix") (kindIs "map" .seenNames) }}
+  {{- if hasKey .seenNames $appName }}
+    {{- fail (printf "two entries render Application %s" $appName) }}
+  {{- end }}
+  {{- $_ := set .seenNames $appName true }}
+{{- end }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -152,6 +162,7 @@ destination:
 ---
 {{- $base := "manifests" }}
 {{- $cluster := $.Values.cluster | default "" }}
+{{- $naming := include "tpl.argocd.naming" $ }}
 {{- $targetRevision := include "tpl.argocd.targetRevision" $ }}
 {{- $defaultNamespace := include "tpl.argocd.defaultNamespace" $ }}
 {{- $seen := dict }}
@@ -185,7 +196,11 @@ destination:
 {{- $extraSync := $extraValues.sync | default dict }}
 {{- $globalSync := $.Values.sync | default dict }}
 {{- $ignoreDifferences := concat ($globalSync.ignoreDifferences | default list) ($extrasSync.ignoreDifferences | default list) ($extraValues.ignoreDifferences | default list) ($extraSync.ignoreDifferences | default list) }}
-{{- $applicationName := include "tpl.argocd.applicationName" (dict "chartName" $.Chart.Name "cluster" $cluster "segments" (list "extras" $appNameSuffix) "environment" $.Values.environment) }}
+{{- $nameSegments := list "extras" $appNameSuffix }}
+{{- if eq $naming "prefix" }}
+  {{- $nameSegments = list $appNameSuffix }}
+{{- end }}
+{{- $applicationName := include "tpl.argocd.applicationName" (dict "chartName" $.Chart.Name "cluster" $cluster "segments" $nameSegments "suffix" "extras" "environment" $.Values.environment "naming" $naming) }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:

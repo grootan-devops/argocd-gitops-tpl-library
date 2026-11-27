@@ -7,6 +7,31 @@ To upgrade, apply every section after your pinned version up to the target, olde
 Newer sections are split into **Required** (the upgrade breaks or misbehaves without it),
 **Recommended** (aligns an existing environment with the current standards) and **Verify**.
 
+## 1.10.0
+
+### Required
+
+No migration required. Without `naming`, every Application renders as before.
+
+### Recommended
+
+To move an environment to `naming: prefix`, set it in both `values.yaml` and
+`extras/values.yaml`. Every Application then gets a new name, which Argo CD treats as a new
+Application. Keep the workloads by retiring the old Applications without cascading:
+
+1. Turn off automated sync on the root and Extras parent that render the old Applications.
+2. Remove every finalizer from the old Applications, including `pre-delete-finalizer.*`, and
+   delete them. Without finalizers Argo CD deletes no resource.
+3. Sync the root with `naming: prefix`. Each new Application's first sync rewrites the
+   `argocd.argoproj.io/tracking-id` annotation on its resources and runs its hooks.
+
+Operators that copy a custom resource's annotations into a pod template roll those pods once.
+
+### Verify
+
+- `helm template` with `naming: prefix` changes only `metadata.name` of each Application.
+- Callers that sync Applications by name (CI deploy jobs) use the new names.
+
 ## 1.9.1
 
 ### Required

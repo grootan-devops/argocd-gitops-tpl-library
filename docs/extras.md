@@ -14,10 +14,11 @@ extras/manifests/
 ```
 
 The generated Application points to `extras/manifests/<directory>` and uses
-`<Chart.Name>[-<cluster>]-extras-<directory>[-<environment>]`. Use `.yaml` filenames, because
+`<Chart.Name>[-<cluster>]-extras-<directory>[-<environment>]`, or
+`<Chart.Name>[-<cluster>][-<environment>]-<directory>-extras` with `naming: prefix`. Use `.yaml` filenames, because
 the library's discovery glob is `**/*.yaml`.
 
-The extras chart must have the same `Chart.Name` as the root chart and its own
+The extras chart must have the same `Chart.Name` and `naming` as the root chart and its own
 `extras/values.yaml`. `extras.enabled` controls the whole extras stack. Per-folder values in
 `apps.<directory>` can disable a folder or override its sync policy. The library merges
 top-level `sync.options`, `extras.sync.options`, and folder options in that precedence order;

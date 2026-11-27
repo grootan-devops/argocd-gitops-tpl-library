@@ -1,0 +1,9 @@
+# A standalone entry and a grouped release that both render <prefix>-admin-frontend.
+naming: prefix
+apps:
+  admin-frontend:
+    namespace: administration
+    chart:
+      repoURL: oci://registry.contoso.com/helm
+      name: admin-frontend
+      version: 1.0.0

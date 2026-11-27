@@ -3,6 +3,7 @@
     {{- fail "renderExtrasManifests must remain false: raw manifests are reconciled through the generated Extras Applications" }}
   {{- end }}
   {{- $ctx := . }}
+  {{- $seen := dict }}
   {{- if .Values.apps }}
     {{- range $rootName, $rootApp := .Values.apps }}
 
@@ -16,7 +17,7 @@
       {{- if $rootEnabled }}
         {{- if hasKey $rootApp "chart" }}
           {{- $path := printf "values/%s.yaml" (include "util.kebabcase" $rootName) }}
-          {{- include "tpl.argocd.application" (merge (dict "name" $rootName "appName" $rootApp "displayName" (include "util.kebabcase" $rootName) "rootApp" "" "valuesPath" $path) $ctx) }}
+          {{- include "tpl.argocd.application" (merge (dict "name" $rootName "appName" $rootApp "displayName" (include "util.kebabcase" $rootName) "rootApp" "" "valuesPath" $path "seenNames" $seen) $ctx) }}
         {{- else }}
           {{- range $childName, $childApp := $rootApp }}
 
@@ -30,7 +31,7 @@
               {{- if $childEnabled }}
                 {{- if hasKey $childApp "chart" }}
                   {{- $path := printf "values/%s/%s.yaml" $rootName (include "util.kebabcase" $childName) }}
-                  {{- include "tpl.argocd.application" (merge (dict "name" $childName "appName" $childApp "displayName" (include "util.kebabcase" $childName) "rootApp" $rootName "valuesPath" $path "groupNamespace" $rootNamespace) $ctx) }}
+                  {{- include "tpl.argocd.application" (merge (dict "name" $childName "appName" $childApp "displayName" (include "util.kebabcase" $childName) "rootApp" $rootName "valuesPath" $path "groupNamespace" $rootNamespace "seenNames" $seen) $ctx) }}
                 {{- else }}
                     {{- range $grandChildName, $grandChildApp := $childApp }}
                       {{- if kindIs "map" $grandChildApp }}
@@ -41,7 +42,7 @@
                             {{- if hasKey $grandChildApp "chart" }}
                               {{- $compositeName := printf "%s-%s" (include "util.kebabcase" $childName) (include "util.kebabcase" $grandChildName) }}
                               {{- $path := printf "values/%s/%s/%s.yaml" $rootName (include "util.kebabcase" $childName) (include "util.kebabcase" $grandChildName) }}
-                              {{- include "tpl.argocd.application" (merge (dict "name" $grandChildName "appName" $grandChildApp "displayName" $compositeName "rootApp" $rootName "valuesPath" $path "groupNamespace" $childNamespace) $ctx) }}
+                              {{- include "tpl.argocd.application" (merge (dict "name" $grandChildName "appName" $grandChildApp "displayName" $compositeName "rootApp" $rootName "valuesPath" $path "groupNamespace" $childNamespace "seenNames" $seen) $ctx) }}
                            {{- end }}
                         {{- end }}
                       {{- end }}
@@ -61,6 +62,6 @@
   {{- end }}
 
   {{- if and .Values.extras $renderExtras }}
-    {{- include "tpl.argocd.application" (merge (dict "appName" .Values.extras "extras" true "name" "extras") $) }}
+    {{- include "tpl.argocd.application" (merge (dict "appName" .Values.extras "extras" true "name" "extras" "seenNames" $seen) $) }}
   {{- end }}
 {{- end }}

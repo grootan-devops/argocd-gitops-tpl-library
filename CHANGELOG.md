@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-11-27
+
+### Added
+
+- Optional `naming` value, `legacy` (default) or `prefix`. `prefix` names Helm entries `<chart>[-<cluster>][-<environment>]-<app-path>`, the extras parent `<chart>[-<cluster>][-<environment>]-extras` and each raw-manifest folder `<chart>[-<cluster>][-<environment>]-<folder>-extras`. It leaves out a group segment that the chart name already ends with, and fails the render when two entries produce the same name.
+- Tests for the `prefix` layout, the duplicate-name check and an unknown `naming` value.
+
+### Changed
+
+- `legacy` names, release names, branches, namespaces and values paths are unchanged; a consumer that doesn't set `naming` renders byte-identical Applications.
+
 ## [1.9.1] - 2026-11-27
 
 ### Fixed

@@ -78,18 +78,35 @@
 {{- $finalList | toYaml -}}
 {{- end -}}
 
+{{/* Application name layout: legacy (default) or prefix. */}}
+{{- define "tpl.argocd.naming" -}}
+{{- $naming := default "legacy" .Values.naming | toString -}}
+{{- if not (has $naming (list "legacy" "prefix")) -}}
+  {{- fail (printf "naming must be legacy or prefix, not %q" $naming) -}}
+{{- end -}}
+{{- $naming -}}
+{{- end -}}
+
+{{/* legacy: <chart>[-<cluster>]-<segments>[-<environment>]; prefix: <chart>[-<cluster>][-<environment>]-<segments>[-<suffix>]. */}}
 {{- define "tpl.argocd.applicationName" -}}
+{{- $prefix := eq (default "legacy" .naming) "prefix" -}}
 {{- $parts := list .chartName -}}
 {{- if .cluster -}}
   {{- $parts = append $parts .cluster -}}
+{{- end -}}
+{{- if and $prefix .environment -}}
+  {{- $parts = append $parts .environment -}}
 {{- end -}}
 {{- range .segments -}}
   {{- if . -}}
     {{- $parts = append $parts . -}}
   {{- end -}}
 {{- end -}}
-{{- if .environment -}}
+{{- if and (not $prefix) .environment -}}
   {{- $parts = append $parts .environment -}}
+{{- end -}}
+{{- if and $prefix .suffix -}}
+  {{- $parts = append $parts .suffix -}}
 {{- end -}}
 {{- join "-" $parts | trunc 253 | trimSuffix "-" -}}
 {{- end -}}

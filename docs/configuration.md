@@ -8,7 +8,8 @@ Set these fields in both root `values.yaml` and `extras/values.yaml`:
 | --- | --- | --- |
 | `enabled` | No | Global switch for the root chart's generated Applications; defaults to `true`. |
 | `cluster` | No | Optional name segment. Omit it or set it to an empty string to exclude it from generated names. |
-| `environment` | No | Optional suffix; an empty value removes it and is never inferred from the branch. |
+| `environment` | No | Optional name segment; an empty value removes it and is never inferred from the branch. |
+| `naming` | No | Application name layout: `legacy` (default) or `prefix`; see [Application names](#application-names). |
 | `project` | No | Argo CD Project for generated child Applications; the library default is `default`. |
 | `server` | Yes for destinations | Argo CD destination cluster name (the `NAME` column in `argocd cluster list`). |
 | `repoURL` | Yes | Git clone URL for the GitOps repository. |
@@ -16,12 +17,28 @@ Set these fields in both root `values.yaml` and `extras/values.yaml`:
 | `namespace` | No | Workload namespace override; defaults to `<Chart.Name>-<environment>` or `<Chart.Name>`. It is not the `argo-cd` namespace. |
 | `preserveResourcesOnDeletion` | No | `true` omits the resource finalizer; default `false` allows pruning on Application deletion. |
 
-The root and extras charts must share the same project-only `Chart.Name`. Generated Helm app
-names follow `<Chart.Name>[-<cluster>]-<app-path>[-<environment>]`; each raw-manifest folder
-uses `<Chart.Name>[-<cluster>]-extras-<folder>[-<environment>]`.
-For example, omitting `cluster` produces `contoso-api-dev` and
-`contoso-extras-clamav-dev`. This does not change `destination.name`, release names,
-branches or namespaces.
+The root and extras charts must share the same `Chart.Name` and the same `naming`.
+
+## Application names
+
+`naming` picks the layout. `<prefix>` is `<Chart.Name>[-<cluster>]`, and with `prefix` also
+`[-<environment>]`:
+
+| Application | `legacy` (default) | `prefix` |
+| --- | --- | --- |
+| Helm entry | `<prefix>-<app-path>[-<environment>]` | `<prefix>-<app-path>` |
+| Extras parent | `<prefix>-extras[-<environment>]` | `<prefix>-extras` |
+| Raw-manifest folder | `<prefix>-extras-<folder>[-<environment>]` | `<prefix>-<folder>-extras` |
+
+For example, chart `contoso` with environment `dev` and no cluster gives `contoso-api-dev`,
+`contoso-extras-dev` and `contoso-extras-clamav-dev` with `legacy`, and `contoso-dev-api`,
+`contoso-dev-extras` and `contoso-dev-clamav-extras` with `prefix`. With `prefix`, the group
+segment is also left out when `Chart.Name` ends with `-<group>` (chart `platform-gitlab`,
+group `gitlab`), and two entries that render the same name fail the render.
+
+Names never change `destination.name`, release names, branches, namespaces or values paths.
+Switching an environment's `naming` renames every Application it renders: Argo CD sees new
+Applications, so treat it as a migration (see `MIGRATION.md`).
 
 ## Root chart values
 
@@ -99,7 +116,7 @@ apps:
       releaseName: billing-worker
 ```
 
-| Entry | Values file | Application name |
+| Entry | Values file | Application name (`legacy`) |
 | --- | --- | --- |
 | `apps.<key>` with `chart` | `values/<key>.yaml` | `<Chart.Name>[-<cluster>]-<key>[-<environment>]` |
 | `apps.<group>.<release>` | `values/<group>/<release>.yaml` | `<Chart.Name>[-<cluster>]-<group>-<release>[-<environment>]` |
@@ -108,7 +125,8 @@ apps:
 - **Keys.** A map without `chart` is a group. Keys and release names are converted to
   kebab-case in names and file paths; the group directory is used exactly as the group key is
   written, so keep every key lowercase kebab-case. `<Chart.Name>` is this root chart's name;
-  the group segment is left out of the Application name when the group key equals it.
+  the group segment is left out of the Application name when the group key equals it (and,
+  with `naming: prefix`, when `<Chart.Name>` ends with `-<group>`).
 - **Chart.** `repoURL`, `name` and `version` (each rendered through `tpl`) select a published
   chart; pin a version that exists in the repository. `path` with optional `valuesFiles`
   selects a chart stored in this repository instead; it reads `values.yaml` and those files

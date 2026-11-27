@@ -215,3 +215,108 @@ tests:
           path: spec.destination.namespace
           value: contoso
         documentIndex: 1
+
+  - it: puts the environment before the app path with naming prefix
+    set:
+      naming: prefix
+    asserts:
+      - hasDocuments:
+          count: 3
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-dev-admin-frontend
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-dev-api
+        documentIndex: 1
+      - equal:
+          path: spec.source.helm.releaseName
+          value: payment-api
+        documentIndex: 1
+      - equal:
+          path: spec.destination.namespace
+          value: payments
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-dev-extras
+        documentIndex: 2
+      - equal:
+          path: spec.source.path
+          value: extras
+        documentIndex: 2
+
+  - it: renders naming prefix without cluster or environment
+    set:
+      naming: prefix
+      cluster: null
+      environment: ""
+    asserts:
+      - equal:
+          path: metadata.name
+          value: contoso-admin-frontend
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: contoso-api
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: contoso-extras
+        documentIndex: 2
+
+  - it: changes only names for every Helm application shape with naming prefix
+    values:
+      - ../values/permutations.yaml
+    set:
+      naming: prefix
+    asserts:
+      - hasDocuments:
+          count: 5
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-prod-group-child
+        documentIndex: 0
+      - equal:
+          path: spec.destination.namespace
+          value: group-ns
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-prod-local
+        documentIndex: 1
+      - equal:
+          path: spec.source.helm.releaseName
+          value: local-release
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-prod-nested-backend-worker
+        documentIndex: 2
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-prod-standalone
+        documentIndex: 3
+      - equal:
+          path: spec.source.helm.releaseName
+          value: standalone-release
+        documentIndex: 3
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-prod-extras
+        documentIndex: 4
+
+  - it: rejects two entries that render the same name with naming prefix
+    values:
+      - ../values/prefix-duplicate.yaml
+    asserts:
+      - failedTemplate:
+          errorMessage: two entries render Application contoso-midgard-dev-admin-frontend
+
+  - it: rejects an unknown naming layout
+    set:
+      naming: short
+    asserts:
+      - failedTemplate:
+          errorMessage: naming must be legacy or prefix, not "short"

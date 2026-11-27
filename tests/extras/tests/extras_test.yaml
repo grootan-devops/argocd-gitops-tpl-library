@@ -149,3 +149,29 @@ tests:
       - equal:
           path: metadata.name
           value: contoso-midgard-extras-clamav-dev
+
+  - it: names a manifest-folder app <prefix>-<folder>-extras with naming prefix
+    set:
+      naming: prefix
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: contoso-midgard-dev-clamav-extras
+      - equal:
+          path: spec.source.path
+          value: extras/manifests/clamav
+      - equal:
+          path: spec.destination.namespace
+          value: contoso-dev
+
+  - it: renders naming prefix manifest-folder names without cluster or environment
+    set:
+      naming: prefix
+      cluster: null
+      environment: ""
+    asserts:
+      - equal:
+          path: metadata.name
+          value: contoso-clamav-extras
